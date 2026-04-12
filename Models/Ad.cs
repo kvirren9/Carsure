@@ -1,3 +1,5 @@
+namespace Carsure.Models;
+
 public class Ad
 {
     public int Id { get; set; }

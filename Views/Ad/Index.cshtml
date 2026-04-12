@@ -1,0 +1,33 @@
+@model IEnumerable<Carsure.Models.Ad>
+
+@{
+    ViewData["Title"] = "Ads";
+}
+
+<section class="ads-page">
+    <div class="ads-hero">
+        <div>
+            <span class="ads-eyebrow">Marketplace</span>
+            <h1 class="ads-title">Available car ads</h1>
+            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.
+            </p>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="ads-empty-state">
+            <h2>No ads available</h2>
+            <p>There are no car ads to show right now.</p>
+        </div>
+    }
+    else
+    {
+        <div class="ads-grid">
+            @foreach (var ad in Model)
+            {
+                <partial name="_AdCard" model="ad" />
+            }
+        </div>
+    }
+</section>

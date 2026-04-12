@@ -1,0 +1,22 @@
+@model Carsure.Models.Ad
+
+<article class="ad-card">
+    <div class="ad-card__header">
+        <span class="ad-card__badge">Used car</span>
+        <span class="ad-card__posted">@Model.CreatedAt.ToString("dd MMM yyyy")</span>
+    </div>
+
+    <div class="ad-card__body">
+        <h2 class="ad-card__title">@Model.Title</h2>
+        <p class="ad-card__description">@Model.Description</p>
+    </div>
+
+    <div class="ad-card__footer">
+        <div>
+            <div class="ad-card__price-label">Price</div>
+            <div class="ad-card__price">@Model.Price.ToString("C")</div>
+        </div>
+
+        <a asp-controller="Ad" asp-action="Details" asp-route-id="@Model.Id" class="ad-card__link">View ad</a>
+    </div>
+</article>

@@ -1,0 +1,31 @@
+@model Carsure.Models.Ad
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="ads-page">
+    <div class="ads-hero">
+        <div>
+            <span class="ads-eyebrow">Ad details</span>
+            <h1 class="ads-title">@Model.Title</h1>
+            <p class="ads-subtitle">Posted on @Model.CreatedAt.ToString("dd MMM yyyy")</p>
+        </div>
+    </div>
+
+    <article class="ad-card">
+        <div class="ad-card__body">
+            <h2 class="ad-card__title">Description</h2>
+            <p class="ad-card__description">@Model.Description</p>
+        </div>
+
+        <div class="ad-card__footer">
+            <div>
+                <div class="ad-card__price-label">Price</div>
+                <div class="ad-card__price">@Model.Price.ToString("C")</div>
+            </div>
+
+            <a asp-controller="Ad" asp-action="Index" class="ad-card__link">Back to ads</a>
+        </div>
+    </article>
+</section>
