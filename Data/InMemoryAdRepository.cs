@@ -5,8 +5,10 @@ using Carsure.Models;
 
 namespace Carsure.Data;
 
-public class InMemoryAdRepository : IAdRepository
+public class InMemoryAdRepository
 {
+    private int _nextId = 7;
+
     private readonly List<Ad> _ads =
     [
         new Ad { Id = 1, Title = "2019 Toyota Corolla", Description = "Well maintained, low mileage.", Price = 15000, CreatedAt = DateTime.Now.AddDays(-5) },
@@ -17,13 +19,25 @@ public class InMemoryAdRepository : IAdRepository
         new Ad { Id = 6, Title = "2016 Audi A4", Description = "Sporty and stylish, great condition.", Price = 20000, CreatedAt = DateTime.Now.AddDays(-3) }
     ];
 
-    public IReadOnlyList<Ad> GetAll()
+    public IReadOnlyList<Ad> GetAll() => _ads.OrderByDescending(ad => ad.CreatedAt).ToList();
+
+    public Ad? GetById(int id) => _ads.FirstOrDefault(ad => ad.Id == id);
+
+    public void Add(Ad ad)
     {
-        return _ads.OrderByDescending(ad => ad.CreatedAt).ToList();
+        ad.Id = _nextId++;
+        _ads.Add(ad);
     }
 
-    public Ad? GetById(int id)
+    public void Update(Ad ad)
     {
-        return _ads.FirstOrDefault(ad => ad.Id == id);
+        var index = _ads.FindIndex(a => a.Id == ad.Id);
+        if (index >= 0)
+            _ads[index] = ad;
+    }
+
+    public void Delete(int id)
+    {
+        _ads.RemoveAll(a => a.Id == id);
     }
 }

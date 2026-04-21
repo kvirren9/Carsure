@@ -78,18 +78,8 @@ body {
   flex-direction: column;
   justify-content: space-between;
   min-height: 100%;
-  padding: 1.5rem;
-  border: 1px solid #dbe4f0;
-  border-radius: 1.25rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-  box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.ad-card:hover {
-  transform: translateY(-4px);
-  border-color: #93c5fd;
-  box-shadow: 0 1.5rem 2.5rem rgba(37, 99, 235, 0.14);
+  padding: 1rem;
+  border: 1px solid #ccc;
 }
 
 .ad-card__header,
@@ -101,15 +91,7 @@ body {
 }
 
 .ad-card__badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: #dbeafe;
-  color: #1d4ed8;
   font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
 }
 
 .ad-card__posted {

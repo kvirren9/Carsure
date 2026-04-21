@@ -1,10 +1,12 @@
 using Carsure.Data;
+using Carsure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IAdRepository, InMemoryAdRepository>();
+builder.Services.AddSingleton<InMemoryAdRepository>();
+builder.Services.AddScoped<AdService>();
 
 var app = builder.Build();
 
