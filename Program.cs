@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<InMemoryAdRepository>();
 builder.Services.AddScoped<AdService>();
+builder.Services.AddSingleton<InMemoryUserRepository>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
