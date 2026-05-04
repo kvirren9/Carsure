@@ -5,24 +5,46 @@ namespace Carsure.Services;
 
 public class AdService
 {
-    private readonly InMemoryAdRepository _adRepository;
+    private readonly ApplicationDbContext _dbContext;
 
-    public AdService(InMemoryAdRepository adRepository)
+    public AdService(ApplicationDbContext dbContext)
     {
-        _adRepository = adRepository;
+        _dbContext = dbContext;
     }
 
-    public IReadOnlyList<Ad> GetAds() => _adRepository.GetAll();
+    public IReadOnlyList<Ad> GetAds() => _dbContext.Ads
+        .OrderByDescending(ad => ad.CreatedAt)
+        .ToList();
 
-    public Ad? GetAdById(int id) => _adRepository.GetById(id);
+    public Ad? GetAdById(int id) => _dbContext.Ads.FirstOrDefault(ad => ad.Id == id);
 
     public void CreateAd(Ad ad)
     {
         ad.CreatedAt = DateTime.UtcNow;
-        _adRepository.Add(ad);
+        _dbContext.Ads.Add(ad);
+        _dbContext.SaveChanges();
     }
 
-    public void UpdateAd(Ad ad) => _adRepository.Update(ad);
+    public void UpdateAd(Ad ad)
+    {
+        var existingAd = _dbContext.Ads.FirstOrDefault(a => a.Id == ad.Id);
+        if (existingAd is null)
+            return;
 
-    public void DeleteAd(int id) => _adRepository.Delete(id);
+        existingAd.Title = ad.Title;
+        existingAd.Description = ad.Description;
+        existingAd.Price = ad.Price;
+
+        _dbContext.SaveChanges();
+    }
+
+    public void DeleteAd(int id)
+    {
+        var ad = _dbContext.Ads.FirstOrDefault(a => a.Id == id);
+        if (ad is null)
+            return;
+
+        _dbContext.Ads.Remove(ad);
+        _dbContext.SaveChanges();
+    }
 }
