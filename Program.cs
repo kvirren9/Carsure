@@ -1,5 +1,6 @@
 using Carsure.Data;
 using Carsure.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddSingleton<InMemoryAdRepository>();
 builder.Services.AddScoped<AdService>();
 builder.Services.AddSingleton<InMemoryUserRepository>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
