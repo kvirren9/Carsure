@@ -51,6 +51,7 @@ namespace Carsure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("RegNumber")
@@ -77,6 +78,9 @@ namespace Carsure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -85,6 +89,7 @@ namespace Carsure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Title")
@@ -92,6 +97,8 @@ namespace Carsure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CarId");
 
                     b.ToTable("Ads");
                 });
@@ -146,6 +153,22 @@ namespace Carsure.Migrations
                     b.HasKey("LocationId");
 
                     b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("Carsure.Models.Ad", b =>
+                {
+                    b.HasOne("Car", "Car")
+                        .WithMany("Ads")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+                });
+
+            modelBuilder.Entity("Car", b =>
+                {
+                    b.Navigation("Ads");
                 });
 #pragma warning restore 612, 618
         }
