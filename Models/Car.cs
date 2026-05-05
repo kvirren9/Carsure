@@ -1,3 +1,5 @@
+using Carsure.Models;
+
 public class Car
 {
     public int CarId { get; set; }
@@ -11,4 +13,5 @@ public class Car
     public decimal Price { get; set; }
     public required string Description { get; set; }
 
+    public ICollection<Ad> Ads { get; set; } = new List<Ad>();
 }
