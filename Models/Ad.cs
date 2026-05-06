@@ -7,4 +7,7 @@ public class Ad
     public string Description { get; set; }
     public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public int CarId { get; set; }
+    public Car Car { get; set; } = null!;
 }

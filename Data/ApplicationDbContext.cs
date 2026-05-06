@@ -26,6 +26,11 @@ namespace Carsure.Data
             modelBuilder.Entity<Car>()
                 .Property(c => c.Price)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Ad>()
+                .HasOne(a => a.Car)
+                .WithMany(c => c.Ads)
+                .HasForeignKey(a => a.CarId);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Carsure.Data;
 using Carsure.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Carsure.Services;
 
@@ -13,10 +14,13 @@ public class AdService
     }
 
     public IReadOnlyList<Ad> GetAds() => _dbContext.Ads
+        .Include(a => a.Car)
         .OrderByDescending(ad => ad.CreatedAt)
         .ToList();
 
-    public Ad? GetAdById(int id) => _dbContext.Ads.FirstOrDefault(ad => ad.Id == id);
+    public Ad? GetAdById(int id) => _dbContext.Ads
+        .Include(a => a.Car)
+        .FirstOrDefault(ad => ad.Id == id);
 
     public void CreateAd(Ad ad)
     {
