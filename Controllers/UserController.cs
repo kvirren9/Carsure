@@ -7,6 +7,9 @@ public class UserController : Controller
 {
     private readonly UserService _userService;
 
+    public const string SessionKeyUserId = "UserId";
+    public const string SessionKeyUserName = "UserName";
+
     public UserController(UserService userService)
     {
         _userService = userService;
@@ -46,6 +49,21 @@ public class UserController : Controller
             return View();
         }
 
+        HttpContext.Session.SetInt32(SessionKeyUserId, user.Id);
+        HttpContext.Session.SetString(SessionKeyUserName, user.Name);
+
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
+    }
+
+    public static int? GetLoggedInUserId(ISession session)
+    {
+        return session.GetInt32(SessionKeyUserId);
     }
 }
