@@ -29,4 +29,21 @@ public class AdController : Controller
 
         return View(ad);
     }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        var isAdmin = UserController.IsAdmin(HttpContext.Session);
+
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        if (!_adService.CanModifyAd(id, userId.Value, isAdmin))
+            return Forbid();
+
+        _adService.DeleteAd(id);
+        TempData["Success"] = "Annonsen har tagits bort.";
+        return RedirectToAction("Index");
+    }
 }
