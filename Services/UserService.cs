@@ -12,9 +12,35 @@ public class UserService
         _dbContext = dbContext;
     }
 
+    public void Save(User user)
+    {
+        var existing = _dbContext.Users.FirstOrDefault(u => u.Id == user.Id);
+        if (existing is null)
+        {
+            _dbContext.Users.Add(user);
+        }
+        else
+        {
+            existing.Name = user.Name;
+            existing.Email = user.Email;
+            existing.PasswordHash = user.PasswordHash;
+        }
+        _dbContext.SaveChanges();
+    }
+
+    public User? FindByEmail(string email)
+    {
+        return _dbContext.Users.FirstOrDefault(u => u.Email == email);
+    }
+
+    public User? FindById(int id)
+    {
+        return _dbContext.Users.FirstOrDefault(u => u.Id == id);
+    }
+
     public bool Register(string name, string email, string password)
     {
-        if (_dbContext.Users.Any(u => u.Email == email))
+        if (FindByEmail(email) is not null)
             return false;
 
         var user = new User
@@ -31,7 +57,7 @@ public class UserService
 
     public User? Login(string email, string password)
     {
-        var user = _dbContext.Users.FirstOrDefault(u => u.Email == email);
+        var user = FindByEmail(email);
 
         if (user is null)
             return null;
