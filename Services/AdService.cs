@@ -14,11 +14,22 @@ public class AdService
     }
 
     public IReadOnlyList<Ad> GetAds() => _dbContext.Ads
+        .Where(a => a.Status == AdStatus.PUBLISHED)
+        .Include(a => a.Car)
+        .OrderByDescending(ad => ad.CreatedAt)
+        .ToList();
+
+    public IReadOnlyList<Ad> GetAllAds() => _dbContext.Ads
         .Include(a => a.Car)
         .OrderByDescending(ad => ad.CreatedAt)
         .ToList();
 
     public Ad? GetAdById(int id) => _dbContext.Ads
+        .Where(a => a.Status == AdStatus.PUBLISHED)
+        .Include(a => a.Car)
+        .FirstOrDefault(ad => ad.Id == id);
+
+    public Ad? GetAdByIdAnyStatus(int id) => _dbContext.Ads
         .Include(a => a.Car)
         .FirstOrDefault(ad => ad.Id == id);
 
