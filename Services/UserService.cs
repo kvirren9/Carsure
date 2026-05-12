@@ -24,6 +24,7 @@ public class UserService
             existing.Name = user.Name;
             existing.Email = user.Email;
             existing.PasswordHash = user.PasswordHash;
+            existing.Role = user.Role;
         }
         _dbContext.SaveChanges();
     }
@@ -38,6 +39,11 @@ public class UserService
         return _dbContext.Users.FirstOrDefault(u => u.Id == id);
     }
 
+    public IReadOnlyList<User> GetAllUsers()
+    {
+        return _dbContext.Users.OrderBy(u => u.Name).ToList();
+    }
+
     public bool Register(string name, string email, string password)
     {
         if (FindByEmail(email) is not null)
@@ -47,7 +53,8 @@ public class UserService
         {
             Name = name,
             Email = email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            Role = UserRole.User
         };
 
         _dbContext.Users.Add(user);
@@ -66,5 +73,16 @@ public class UserService
             return null;
 
         return user;
+    }
+
+    public bool SetRole(int userId, UserRole role)
+    {
+        var user = FindById(userId);
+        if (user is null)
+            return false;
+
+        user.Role = role;
+        _dbContext.SaveChanges();
+        return true;
     }
 }
