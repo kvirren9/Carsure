@@ -31,6 +31,12 @@ namespace Carsure.Data
                 .HasOne(a => a.Car)
                 .WithMany(c => c.Ads)
                 .HasForeignKey(a => a.CarId);
+
+            modelBuilder.Entity<Ad>()
+                .HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

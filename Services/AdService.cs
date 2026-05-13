@@ -16,10 +16,18 @@ public class AdService
     public IReadOnlyList<Ad> GetAds() => _dbContext.Ads
         .Where(a => a.Status == AdStatus.PUBLISHED)
         .Include(a => a.Car)
+        .Include(a => a.User)
         .OrderByDescending(ad => ad.CreatedAt)
         .ToList();
 
     public IReadOnlyList<Ad> GetAllAds() => _dbContext.Ads
+        .Include(a => a.Car)
+        .Include(a => a.User)
+        .OrderByDescending(ad => ad.CreatedAt)
+        .ToList();
+
+    public IReadOnlyList<Ad> GetAdsByUser(int userId) => _dbContext.Ads
+        .Where(a => a.UserId == userId)
         .Include(a => a.Car)
         .OrderByDescending(ad => ad.CreatedAt)
         .ToList();
@@ -27,10 +35,12 @@ public class AdService
     public Ad? GetAdById(int id) => _dbContext.Ads
         .Where(a => a.Status == AdStatus.PUBLISHED)
         .Include(a => a.Car)
+        .Include(a => a.User)
         .FirstOrDefault(ad => ad.Id == id);
 
     public Ad? GetAdByIdAnyStatus(int id) => _dbContext.Ads
         .Include(a => a.Car)
+        .Include(a => a.User)
         .FirstOrDefault(ad => ad.Id == id);
 
     public void CreateAd(Ad ad)
@@ -61,5 +71,13 @@ public class AdService
 
         _dbContext.Ads.Remove(ad);
         _dbContext.SaveChanges();
+    }
+
+
+    public bool CanModifyAd(int adId, int userId, bool isAdmin)
+    {
+        if (isAdmin) return true;
+        var ad = _dbContext.Ads.FirstOrDefault(a => a.Id == adId);
+        return ad?.UserId == userId;
     }
 }

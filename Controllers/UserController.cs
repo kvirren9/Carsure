@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Carsure.Services;
+using Carsure.Models;
 
 namespace Carsure.Controllers;
 
@@ -9,6 +10,7 @@ public class UserController : Controller
 
     public const string SessionKeyUserId = "UserId";
     public const string SessionKeyUserName = "UserName";
+    public const string SessionKeyUserRole = "UserRole";
 
     public UserController(UserService userService)
     {
@@ -51,6 +53,7 @@ public class UserController : Controller
 
         HttpContext.Session.SetInt32(SessionKeyUserId, user.Id);
         HttpContext.Session.SetString(SessionKeyUserName, user.Name);
+        HttpContext.Session.SetString(SessionKeyUserRole, user.Role.ToString());
 
         return RedirectToAction("Index", "Home");
     }
@@ -65,5 +68,16 @@ public class UserController : Controller
     public static int? GetLoggedInUserId(ISession session)
     {
         return session.GetInt32(SessionKeyUserId);
+    }
+
+    public static bool IsAdmin(ISession session)
+    {
+        var role = session.GetString(SessionKeyUserRole);
+        return role == UserRole.Admin.ToString();
+    }
+
+    public static bool IsLoggedIn(ISession session)
+    {
+        return session.GetInt32(SessionKeyUserId) != null;
     }
 }

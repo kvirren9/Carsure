@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
+    var currentUserId = Context.Session.GetInt32("UserId");
+    var isOwner = currentUserId.HasValue && Model.UserId == currentUserId.Value;
+    var canDelete = isAdmin || isOwner;
 }
 
 <section class="ads-page">
@@ -13,10 +17,19 @@
         </div>
     </div>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
     <article class="ad-card">
         <div class="ad-card__body">
             <h2 class="ad-card__title">Description</h2>
             <p class="ad-card__description">@Model.Description</p>
+            @if (Model.User != null)
+            {
+                <p class="text-muted small">Posted by: @Model.User.Name</p>
+            }
         </div>
 
         <div class="ad-card__footer">
@@ -25,7 +38,18 @@
                 <div class="ad-card__price">@Model.Price.ToString("C")</div>
             </div>
 
-            <a asp-controller="Ad" asp-action="Index" class="ad-card__link">Back to ads</a>
+            <div class="d-flex gap-2 align-items-center">
+                <a asp-controller="Ad" asp-action="Index" class="ad-card__link">Back to ads</a>
+
+                @if (canDelete)
+                {
+                    <form asp-controller="Ad" asp-action="Delete" method="post" class="d-inline"
+                          onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Ta bort annons</button>
+                    </form>
+                }
+            </div>
         </div>
     </article>
 </section>
