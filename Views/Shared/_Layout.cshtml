@@ -33,9 +33,21 @@
                     <ul class="navbar-nav">
                         @if (Context.Session.GetInt32("UserId") != null)
                         {
+                            @if (Context.Session.GetString("UserRole") == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-semibold" asp-controller="Admin" asp-action="Index">
+                                        ⚙ Admin
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <span class="nav-link text-dark">
                                     Inloggad som <strong>@Context.Session.GetString("UserName")</strong>
+                                    @if (Context.Session.GetString("UserRole") == "Admin")
+                                    {
+                                        <span class="badge bg-danger ms-1">Admin</span>
+                                    }
                                 </span>
                             </li>
                             <li class="nav-item">
