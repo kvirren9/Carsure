@@ -1,0 +1,71 @@
+@model Carsure.Models.EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Redigera profil";
+}
+
+<section class="ads-page">
+
+    <div class="ads-hero">
+        <div>
+            <span class="ads-eyebrow">Mitt konto</span>
+            <h1 class="ads-title">Redigera profil</h1>
+            <p class="ads-subtitle">Uppdatera dina uppgifter nedan.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+
+                <form asp-controller="User" asp-action="EditProfile" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <h5 class="fw-bold mb-4" style="color:#0f172a;">Personuppgifter</h5>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold">Namn</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ditt namn" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label fw-semibold">E-postadress</label>
+                        <input asp-for="Email" class="form-control" placeholder="din@email.se" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h5 class="fw-bold mb-1" style="color:#0f172a;">Byt lösenord</h5>
+                    <p class="text-muted small mb-3">Lämna tomt om du inte vill byta lösenord.</p>
+
+                    <div class="mb-3">
+                        <label asp-for="NewPassword" class="form-label fw-semibold">Nytt lösenord</label>
+                        <input asp-for="NewPassword" type="password" class="form-control"
+                               placeholder="Minst 6 tecken" autocomplete="new-password" />
+                        <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmPassword" class="form-label fw-semibold">Bekräfta lösenord</label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control"
+                               placeholder="Upprepa lösenordet" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-dark px-4 fw-semibold">Spara ändringar</button>
+                        <a asp-controller="User" asp-action="Profile" class="btn btn-outline-secondary px-4">Avbryt</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -7,14 +7,16 @@ namespace Carsure.Controllers;
 public class UserController : Controller
 {
     private readonly UserService _userService;
+    private readonly AdService _adService;
 
     public const string SessionKeyUserId = "UserId";
     public const string SessionKeyUserName = "UserName";
     public const string SessionKeyUserRole = "UserRole";
 
-    public UserController(UserService userService)
+    public UserController(UserService userService, AdService adService)
     {
         _userService = userService;
+        _adService = adService;
     }
 
     [HttpGet]
@@ -55,7 +57,7 @@ public class UserController : Controller
         HttpContext.Session.SetString(SessionKeyUserName, user.Name);
         HttpContext.Session.SetString(SessionKeyUserRole, user.Role.ToString());
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Profile");
     }
 
     [HttpPost]
@@ -63,6 +65,76 @@ public class UserController : Controller
     {
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
+    }
+
+    public IActionResult Profile()
+    {
+        var userId = GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login");
+
+        var user = _userService.FindById(userId.Value);
+        if (user is null)
+            return RedirectToAction("Login");
+
+        var ads = _adService.GetAdsByUser(userId.Value);
+
+        var viewModel = new UserProfileViewModel
+        {
+            User = user,
+            Ads = ads
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpGet]
+    public IActionResult EditProfile()
+    {
+        var userId = GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login");
+
+        var user = _userService.FindById(userId.Value);
+        if (user is null)
+            return RedirectToAction("Login");
+
+        var viewModel = new EditProfileViewModel
+        {
+            Name = user.Name,
+            Email = user.Email
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult EditProfile(EditProfileViewModel model)
+    {
+        var userId = GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login");
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var success = _userService.UpdateProfile(
+            userId.Value,
+            model.Name,
+            model.Email,
+            model.NewPassword
+        );
+
+        if (!success)
+        {
+            ModelState.AddModelError("Email", "E-postadressen används redan av ett annat konto.");
+            return View(model);
+        }
+
+        HttpContext.Session.SetString(SessionKeyUserName, model.Name);
+
+        TempData["Success"] = "Din profil har uppdaterats!";
+        return RedirectToAction("Profile");
     }
 
     public static int? GetLoggedInUserId(ISession session)

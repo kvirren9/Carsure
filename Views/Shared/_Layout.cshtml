@@ -42,13 +42,13 @@
                                 </li>
                             }
                             <li class="nav-item">
-                                <span class="nav-link text-dark">
-                                    Inloggad som <strong>@Context.Session.GetString("UserName")</strong>
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Profile">
+                                    👤 <strong>@Context.Session.GetString("UserName")</strong>
                                     @if (Context.Session.GetString("UserRole") == "Admin")
                                     {
                                         <span class="badge bg-danger ms-1">Admin</span>
                                     }
-                                </span>
+                                </a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
