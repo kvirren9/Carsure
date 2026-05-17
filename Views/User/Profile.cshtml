@@ -1,0 +1,162 @@
+@model Carsure.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Min profil";
+}
+
+<section class="ads-page">
+
+    <div class="ads-hero">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <span class="ads-eyebrow">Mitt konto</span>
+                <h1 class="ads-title">@Model.User.Name</h1>
+                <p class="ads-subtitle">@Model.User.Email</p>
+            </div>
+            <div class="d-flex gap-2 align-items-center mt-2">
+                @if (Model.User.Role == Carsure.Models.UserRole.Admin)
+                {
+                    <span class="badge bg-danger fs-6 px-3 py-2">Admin</span>
+                }
+                else
+                {
+                    <span class="badge bg-primary fs-6 px-3 py-2">Användare</span>
+                }
+                <a asp-controller="User" asp-action="EditProfile"
+                   class="btn btn-light btn-sm fw-semibold">✏️ Redigera profil</a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-3">
+        <div class="col-6 col-md-4">
+            <div class="profile-stat-card">
+                <div class="profile-stat-number">@Model.TotalAds</div>
+                <div class="profile-stat-label">Totalt annonser</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="profile-stat-card profile-stat-card--green">
+                <div class="profile-stat-number">@Model.PublishedAds</div>
+                <div class="profile-stat-label">Publicerade</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="profile-stat-card profile-stat-card--gray">
+                <div class="profile-stat-number">@Model.DraftAds</div>
+                <div class="profile-stat-label">Utkast</div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0" style="font-size:1.4rem; font-weight:700; color:#0f172a;">Mina annonser</h2>
+            <a asp-controller="Ad" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                Bläddra bland alla annonser
+            </a>
+        </div>
+
+        @if (!Model.Ads.Any())
+        {
+            <div class="ads-empty-state">
+                <div style="font-size:2.5rem; margin-bottom:0.5rem;">🚗</div>
+                <h3>Inga annonser ännu</h3>
+                <p class="text-muted">Du har inte skapat några annonser ännu.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Titel</th>
+                            <th>Pris</th>
+                            <th>Status</th>
+                            <th>Skapad</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ad in Model.Ads)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@ad.Title</td>
+                                <td>@ad.Price.ToString("C")</td>
+                                <td>
+                                    @switch (ad.Status)
+                                    {
+                                        case Carsure.Models.AdStatus.PUBLISHED:
+                                            <span class="badge bg-success">Publicerad</span>
+                                            break;
+                                        case Carsure.Models.AdStatus.DRAFT:
+                                            <span class="badge bg-secondary">Utkast</span>
+                                            break;
+                                        case Carsure.Models.AdStatus.SOLD:
+                                            <span class="badge bg-warning text-dark">Såld</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-light text-dark">@ad.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-muted small">@ad.CreatedAt.ToString("dd MMM yyyy")</td>
+                                <td class="text-end">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        @if (ad.Status == Carsure.Models.AdStatus.PUBLISHED)
+                                        {
+                                            <a asp-controller="Ad" asp-action="Details" asp-route-id="@ad.Id"
+                                               class="btn btn-outline-secondary btn-sm">Visa</a>
+                                        }
+                                        <form asp-controller="Ad" asp-action="Delete" method="post" class="d-inline"
+                                              onsubmit="return confirm('Är du säker på att du vill ta bort annonsen?');">
+                                            <input type="hidden" name="id" value="@ad.Id" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Ta bort</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+</section>
+
+@section Scripts {
+    <style>
+        .profile-stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+        .profile-stat-card--green { border-color: #bbf7d0; background: #f0fdf4; }
+        .profile-stat-card--gray  { border-color: #e2e8f0; background: #f8fafc; }
+        .profile-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+        }
+        .profile-stat-label {
+            margin-top: 0.35rem;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+    </style>
+}

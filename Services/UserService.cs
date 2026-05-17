@@ -85,4 +85,25 @@ public class UserService
         _dbContext.SaveChanges();
         return true;
     }
+
+
+    public bool UpdateProfile(int userId, string name, string email, string? newPassword)
+    {
+        var user = FindById(userId);
+        if (user is null)
+            return false;
+
+        var existing = FindByEmail(email);
+        if (existing is not null && existing.Id != userId)
+            return false;
+
+        user.Name = name;
+        user.Email = email;
+
+        if (!string.IsNullOrWhiteSpace(newPassword))
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+        _dbContext.SaveChanges();
+        return true;
+    }
 }
