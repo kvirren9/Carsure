@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Carsure.Services;
+using Carsure.Models;
 
 namespace Carsure.Controllers;
 
@@ -28,6 +29,55 @@ public class AdController : Controller
         }
 
         return View(ad);
+    }
+
+    [HttpGet]
+    public IActionResult Create()
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        return View(new CreateAdViewModel());
+    }
+
+    [HttpPost]
+    public IActionResult Create(CreateAdViewModel vm)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        var car = new Car
+        {
+            RegNumber = vm.RegNumber,
+            Brand = vm.Brand,
+            Model = vm.Model,
+            Year = vm.Year,
+            MileAge = vm.MileAge,
+            FuelType = vm.FuelType,
+            Transmission = vm.Transmission,
+            Price = vm.Price,
+            Description = vm.Description
+        };
+
+        var ad = new Ad
+        {
+            Title = vm.Title,
+            Description = vm.Description,
+            Price = vm.Price,
+            Status = vm.Status,
+            UserId = userId.Value,
+            Car = car
+        };
+
+        _adService.CreateAdWithCar(ad, car);
+
+        TempData["Success"] = "Din annons har skapats!";
+        return RedirectToAction("Profile", "User");
     }
 
     [HttpPost]
