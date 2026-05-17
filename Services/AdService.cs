@@ -50,6 +50,16 @@ public class AdService
         _dbContext.SaveChanges();
     }
 
+
+    public void CreateAdWithCar(Ad ad, Car car)
+    {
+        ad.CreatedAt = DateTime.UtcNow;
+        ad.Car = car;
+        _dbContext.Cars.Add(car);
+        _dbContext.Ads.Add(ad);
+        _dbContext.SaveChanges();
+    }
+
     public void UpdateAd(Ad ad)
     {
         var existingAd = _dbContext.Ads.FirstOrDefault(a => a.Id == ad.Id);
