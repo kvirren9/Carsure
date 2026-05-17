@@ -35,6 +35,125 @@ body {
   gap: 2rem;
 }
 
+.ads-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.ads-filters {
+  position: sticky;
+  top: 1rem;
+}
+
+.ads-filter-form {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.2rem;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.ads-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ads-filter-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ads-filter-clear {
+  font-size: 0.82rem;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.ads-filter-clear:hover {
+  text-decoration: underline;
+}
+
+.ads-filter-group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ads-filter-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ads-filter-input,
+.ads-filter-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ads-filter-input:focus,
+.ads-filter-select:focus {
+  border-color: #1d4ed8;
+  background: #fff;
+}
+
+.ads-filter-range {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ads-filter-range .ads-filter-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.ads-filter-range-sep {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.ads-filter-submit {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ads-filter-submit:hover {
+  background: #1e293b;
+}
+
+.ads-results {
+  min-width: 0;
+}
+
+.ads-result-count {
+  margin: 0 0 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
 .ads-hero {
   padding: 2rem;
   border-radius: 1.5rem;
@@ -234,6 +353,16 @@ body {
   border-radius: 1.25rem;
   background: #f8fafc;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .ads-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ads-filters {
+    position: static;
+  }
 }
 
 @media (max-width: 576px) {

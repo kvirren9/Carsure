@@ -39,6 +39,11 @@ function AdCard({ ad }) {
         React.createElement(
           "span",
           { className: "ad-card-react__meta-item" },
+          `${ad.brand} ${ad.model}`
+        ),
+        React.createElement(
+          "span",
+          { className: "ad-card-react__meta-item" },
           ad.year
         ),
         React.createElement(
@@ -65,9 +70,7 @@ function AdCardList({ ads }) {
 }
 
 const rootElement = document.getElementById("ad-list-react-root");
-const dataElement = document.getElementById("ad-list-data");
-
-if (rootElement && dataElement) {
-  const ads = JSON.parse(dataElement.textContent || "[]");
+if (rootElement) {
+  const ads = window.__adListData || [];
   createRoot(rootElement).render(React.createElement(AdCardList, { ads }));
 }

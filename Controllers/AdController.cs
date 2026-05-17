@@ -13,9 +13,12 @@ public class AdController : Controller
         _adService = adService;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(AdSearchViewModel filters)
     {
-        var ads = _adService.GetAds();
+        var ads = _adService.SearchAds(filters);
+        ViewBag.Brands = _adService.GetPublishedBrands();
+        ViewBag.Models = _adService.GetPublishedModels(filters.Brand);
+        ViewBag.Filters = filters;
         return View(ads);
     }
 
