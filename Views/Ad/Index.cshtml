@@ -1,7 +1,21 @@
 @model IEnumerable<Carsure.Models.Ad>
+@using System.Text.Json
 
 @{
     ViewData["Title"] = "Ads";
+    var adCards = Model.Select(ad => new
+    {
+        id = ad.Id,
+        title = ad.Title,
+        price = ad.Price,
+        shortDescription = ad.Description,
+        year = ad.Car.Year,
+        mileage = ad.Car.MileAge,
+        imageUrl = (string?)null,
+        detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
+    }).ToList();
+
+    var adCardsJson = JsonSerializer.Serialize(adCards);
 }
 
 <section class="ads-page">
@@ -23,11 +37,11 @@
     }
     else
     {
-        <div class="ads-grid">
-            @foreach (var ad in Model)
-            {
-                <partial name="_AdCard" model="ad" />
-            }
-        </div>
+        <div id="ad-list-react-root"></div>
+        <script id="ad-list-data" type="application/json">@Html.Raw(adCardsJson)</script>
     }
 </section>
+
+@section Scripts {
+    <script type="module" src="~/dist/ad-card-list.js" asp-append-version="true"></script>
+}
