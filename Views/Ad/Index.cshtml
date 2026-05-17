@@ -11,7 +11,7 @@
         shortDescription = ad.Description,
         year = ad.Car.Year,
         mileage = ad.Car.MileAge,
-        imageUrl = (string?)null,
+        imageUrl = ad.ImageUrl,
         detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
     }).ToList();
 
