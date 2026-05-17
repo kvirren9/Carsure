@@ -42,6 +42,12 @@
                                 </li>
                             }
                             <li class="nav-item">
+                                <a class="nav-link text-dark fw-semibold" asp-controller="Ad" asp-action="Create"
+                                   style="color:#1d4ed8 !important;">
+                                    + Skapa annons
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="User" asp-action="Profile">
                                     👤 <strong>@Context.Session.GetString("UserName")</strong>
                                     @if (Context.Session.GetString("UserRole") == "Admin")

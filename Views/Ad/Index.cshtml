@@ -1,14 +1,21 @@
 @model IEnumerable<Carsure.Models.Ad>
 @using System.Text.Json
+@using Carsure.Models
 
 @{
     ViewData["Title"] = "Ads";
+    var filters = ViewBag.Filters as AdSearchViewModel ?? new AdSearchViewModel();
+    var brands = ViewBag.Brands as List<string> ?? new List<string>();
+    var models = ViewBag.Models as List<string> ?? new List<string>();
+
     var adCards = Model.Select(ad => new
     {
         id = ad.Id,
         title = ad.Title,
         price = ad.Price,
         shortDescription = ad.Description,
+        brand = ad.Car.Brand,
+        model = ad.Car.Model,
         year = ad.Car.Year,
         mileage = ad.Car.MileAge,
         imageUrl = ad.ImageUrl,
@@ -23,24 +30,107 @@
         <div>
             <span class="ads-eyebrow">Marketplace</span>
             <h1 class="ads-title">Available car ads</h1>
-            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.
-            </p>
+            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.</p>
         </div>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="ads-empty-state">
-            <h2>No ads available</h2>
-            <p>There are no car ads to show right now.</p>
+    <div class="ads-layout">
+        <aside class="ads-filters">
+            <form method="get" action="@Url.Action("Index", "Ad")" class="ads-filter-form">
+                <div class="ads-filter-header">
+                    <h2 class="ads-filter-title">Filter</h2>
+                    @if (!string.IsNullOrWhiteSpace(filters.Keyword) || !string.IsNullOrWhiteSpace(filters.Brand) ||
+                         !string.IsNullOrWhiteSpace(filters.Model) || filters.MinYear.HasValue || filters.MaxYear.HasValue ||
+                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue)
+                    {
+                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Clear all</a>
+                    }
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="Keyword">Sökord</label>
+                    <input class="ads-filter-input" type="text" id="Keyword" name="Keyword"
+                           value="@filters.Keyword" placeholder="Sök titel, märke…" />
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="Brand">Märke</label>
+                    <select class="ads-filter-select" id="Brand" name="Brand">
+                        <option value="">Alla</option>
+                        @foreach (var brand in brands)
+                        {
+                            if (filters.Brand == brand)
+                            {
+                                <option value="@brand" selected>@brand</option>
+                            }
+                            else
+                            {
+                                <option value="@brand">@brand</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="Modell">Model</label>
+                    <select class="ads-filter-select" id="Model" name="Model">
+                        <option value="">Alla modeller</option>
+                        @foreach (var m in models)
+                        {
+                            if (filters.Model == m)
+                            {
+                                <option value="@m" selected>@m</option>
+                            }
+                            else
+                            {
+                                <option value="@m">@m</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label">Årsmodell</label>
+                    <div class="ads-filter-range">
+                        <input class="ads-filter-input" type="number" name="Min" placeholder="Från"
+                               value="@filters.MinYear" min="1900" max="2100" />
+                        <span class="ads-filter-range-sep">–</span>
+                        <input class="ads-filter-input" type="number" name="Max" placeholder="Till"
+                               value="@filters.MaxYear" min="1900" max="2100" />
+                    </div>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label">Pris (SEK)</label>
+                    <div class="ads-filter-range">
+                        <input class="ads-filter-input" type="number" name="Min" placeholder="Min"
+                               value="@filters.MinPrice" min="0" />
+                        <span class="ads-filter-range-sep">–</span>
+                        <input class="ads-filter-input" type="number" name="Max" placeholder="Max"
+                               value="@filters.MaxPrice" min="0" />
+                    </div>
+                </div>
+
+                <button class="ads-filter-submit" type="submit"Använd filter</button>
+            </form>
+        </aside>
+
+        <div class="ads-results">
+            @if (!Model.Any())
+            {
+                <div class="ads-empty-state">
+                    <h2>Inga annonser hittades</h2>
+                </div>
+            }
+            else
+            {
+                <p class="ads-result-count">@Model.Count() result@(Model.Count() == 1 ? "" : "s") found</p>
+                <div id="ad-list-react-root"></div>
+            }
         </div>
-    }
-    else
-    {
-        <div id="ad-list-react-root"></div>
-        <script id="ad-list-data" type="application/json">@Html.Raw(adCardsJson)</script>
-    }
+    </div>
 </section>
+<script>window.__adListData = @Html.Raw(adCardsJson);</script>
 
 @section Scripts {
     <script type="module" src="~/dist/ad-card-list.js" asp-append-version="true"></script>
