@@ -19,6 +19,18 @@ function AdCard({ ad }) {
   return React.createElement(
     "article",
     { className: "ad-card-react" },
+    ad.imageUrl
+      ? React.createElement(
+          "div",
+          { className: "ad-card-react__image-wrap" },
+          React.createElement("img", {
+            className: "ad-card-react__image",
+            src: ad.imageUrl,
+            alt: ad.title,
+            loading: "lazy",
+          })
+        )
+      : null,
     React.createElement(
       "div",
       { className: "ad-card-react__content" },
