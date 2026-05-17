@@ -45,3 +45,7 @@ AI-baserade rekommendationer av bilar och försäkringar
 Mobilanpassad design
 Betalningslösningar
 Användarkonton och verifiering
+
+
+If you ever want to skip frontend build for a run, use:
+dotnet build /p:SkipFrontendBuild=true
