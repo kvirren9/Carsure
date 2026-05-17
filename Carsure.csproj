@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="MailKit" Version="4.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
@@ -16,9 +17,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <Target Name="BuildFrontendAssets"
-          BeforeTargets="Build"
-          Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\package.json') and '$(SkipFrontendBuild)' != 'true'">
+  <Target Name="BuildFrontendAssets" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\package.json') and '$(SkipFrontendBuild)' != 'true'">
     <Message Importance="high" Text="Building frontend assets with Vite..." />
     <Exec Command="npm run build:frontend" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
