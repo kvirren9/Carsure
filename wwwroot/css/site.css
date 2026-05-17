@@ -8,8 +8,14 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow:
+    0 0 0 0.1rem white,
+    0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -21,12 +27,14 @@ body {
   margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
 
@@ -387,5 +395,129 @@ body {
 
   .ad-card__link {
     width: 100%;
+  }
+}
+
+/* ── Contact Seller – Details page block ─────────────────────────── */
+.ad-card__contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.85rem;
+}
+
+.ad-card__contact--guest {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.ad-card__contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ad-card__contact-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.ad-card__contact-email {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.ad-card__contact-email:hover {
+  text-decoration: underline;
+}
+
+/* ── Contact Seller – Dedicated form page ────────────────────────── */
+.contact-seller-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.contact-seller-card {
+  width: 100%;
+  max-width: 640px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.2rem;
+  padding: 2rem;
+  box-shadow: 0 0.85rem 2rem rgba(15, 23, 42, 0.08);
+}
+
+.contact-seller-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.contact-seller-info__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #1d4ed8;
+  flex-shrink: 0;
+}
+
+.contact-seller-info__label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.contact-seller-info__value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.contact-seller-divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.25rem 0 1.5rem;
+}
+
+.contact-seller-sender {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.9rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.6rem;
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+@media (max-width: 576px) {
+  .ad-card__contact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .contact-seller-card {
+    padding: 1.25rem;
   }
 }
