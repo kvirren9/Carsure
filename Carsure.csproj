@@ -16,4 +16,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <Target Name="BuildFrontendAssets"
+          BeforeTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\package.json') and '$(SkipFrontendBuild)' != 'true'">
+    <Message Importance="high" Text="Building frontend assets with Vite..." />
+    <Exec Command="npm run build:frontend" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
 </Project>

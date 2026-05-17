@@ -485,3 +485,5 @@ $RECYCLE.BIN/
 
 # Appsettings files
 appsettings.Development.json
+
+*.lscache 
