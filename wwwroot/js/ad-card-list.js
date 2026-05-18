@@ -83,9 +83,10 @@ function AdCard({ ad }) {
             : null
         )
       : null,
+
     React.createElement(
       "div",
-      { className: "ad-card-react__content" },
+      { className: "ad-card-react__content", key: "content" },
       React.createElement("h2", { className: "ad-card-react__title" }, ad.title),
       React.createElement(
         "p",
