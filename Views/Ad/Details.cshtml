@@ -1,4 +1,5 @@
 @model Carsure.Models.Ad
+@using System.Text.Json
 
 @{
     ViewData["Title"] = Model.Title;
@@ -8,6 +9,24 @@
     var canDelete = isAdmin || isOwner;
     var isLoggedIn = currentUserId.HasValue;
     var canContact = isLoggedIn && !isOwner && Model.User != null;
+    var adCard = new[]
+    {
+        new
+        {
+            id = Model.Id,
+            title = Model.Title,
+            price = Model.Price,
+            shortDescription = Model.Description,
+            brand = Model.Car.Brand,
+            model = Model.Car.Model,
+            year = Model.Car.Year,
+            mileage = Model.Car.MileAge,
+            imageUrl = Model.ImageUrl,
+            detailsUrl = Url.Action("Details", "Ad", new { id = Model.Id }),
+            hideDetailsButton = true
+        }
+    };
+    var adCardJson = JsonSerializer.Serialize(adCard);
 }
 
 <section class="ads-page">
@@ -28,7 +47,9 @@
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <article class="ad-card">
+    <div id="ad-list-react-root"></div>
+
+    <article class="ad-card mt-4">
         <div class="ad-card__body">
             <h2 class="ad-card__title">Description</h2>
             <p class="ad-card__description">@Model.Description</p>
@@ -93,3 +114,9 @@
         </div>
     </article>
 </section>
+
+<script>window.__adListData = @Html.Raw(adCardJson);</script>
+
+@section Scripts {
+    <script type="module" src="~/dist/ad-card-list.js" asp-append-version="true"></script>
+}
