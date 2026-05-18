@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Carsure.Models;
 
-public class CreateAdViewModel
+public class CreateAdViewModel : IValidatableObject
 {
 
     [Required(ErrorMessage = "Titel är obligatoriskt")]
@@ -52,4 +52,55 @@ public class CreateAdViewModel
     [Required(ErrorMessage = "Växellåda är obligatoriskt")]
     [Display(Name = "Växellåda")]
     public string Transmission { get; set; } = string.Empty;
+
+    [Display(Name = "Bild-URL:er")]
+    public string? ImageUrlsInput { get; set; }
+
+    private List<string> ParseImageUrls()
+    {
+        if (string.IsNullOrWhiteSpace(ImageUrlsInput))
+            return new List<string>();
+
+        return ImageUrlsInput
+            .Split(new[] { '\r', '\n', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public List<string> GetImageUrls(int maxCount = 10)
+    {
+        if (maxCount <= 0)
+            return new List<string>();
+
+        return ParseImageUrls()
+            .Take(maxCount)
+            .ToList();
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var imageUrls = ParseImageUrls();
+
+        if (imageUrls.Count > 10)
+        {
+            yield return new ValidationResult(
+                "Max 10 bilder är tillåtet.",
+                new[] { nameof(ImageUrlsInput) });
+            yield break;
+        }
+
+        foreach (var imageUrl in imageUrls)
+        {
+            if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out var uriResult) ||
+                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+            {
+                yield return new ValidationResult(
+                    "Alla bild-URL:er måste vara giltiga http/https-länkar.",
+                    new[] { nameof(ImageUrlsInput) });
+                yield break;
+            }
+        }
+    }
 }
