@@ -7,10 +7,14 @@ namespace Carsure.Controllers;
 public class AdController : Controller
 {
     private readonly AdService _adService;
+    private readonly UserService _userService;
+    private readonly IEmailService _emailService;
 
-    public AdController(AdService adService)
+    public AdController(AdService adService, UserService userService, IEmailService emailService)
     {
         _adService = adService;
+        _userService = userService;
+        _emailService = emailService;
     }
 
     public IActionResult Index(AdSearchViewModel filters)
@@ -98,5 +102,105 @@ public class AdController : Controller
         _adService.DeleteAd(id);
         TempData["Success"] = "Annonsen har tagits bort.";
         return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public IActionResult ContactSeller(int id)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        var ad = _adService.GetAdById(id);
+        if (ad is null)
+            return NotFound();
+
+        // Prevent seller from contacting themselves
+        if (ad.UserId == userId.Value)
+        {
+            TempData["Error"] = "Du kan inte kontakta dig själv.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        var sender = _userService.FindById(userId.Value);
+        if (sender is null)
+            return RedirectToAction("Login", "User");
+
+        var vm = new ContactSellerViewModel
+        {
+            AdId = ad.Id,
+            AdTitle = ad.Title,
+            SellerName = ad.User?.Name ?? string.Empty,
+            SellerEmail = ad.User?.Email ?? string.Empty,
+            SenderName = sender.Name,
+            SenderEmail = sender.Email,
+            Subject = $"Fråga om: {ad.Title}"
+        };
+
+        return View(vm);
+    }
+
+    // POST: /Ad/ContactSeller
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ContactSeller(ContactSellerViewModel vm)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        var ad = _adService.GetAdById(vm.AdId);
+        if (ad is null)
+            return NotFound();
+
+        // Prevent seller from contacting themselves
+        if (ad.UserId == userId.Value)
+        {
+            TempData["Error"] = "Du kan inte kontakta dig själv.";
+            return RedirectToAction("Details", new { id = vm.AdId });
+        }
+
+        var sender = _userService.FindById(userId.Value);
+        if (sender is null)
+            return RedirectToAction("Login", "User");
+
+        // Re-populate read-only fields
+        vm.SellerName = ad.User?.Name ?? string.Empty;
+        vm.SellerEmail = ad.User?.Email ?? string.Empty;
+        vm.AdTitle = ad.Title;
+        vm.SenderName = sender.Name;
+        vm.SenderEmail = sender.Email;
+
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        if (string.IsNullOrWhiteSpace(vm.SellerEmail))
+        {
+            ModelState.AddModelError(string.Empty, "Säljaren har ingen e-postadress registrerad.");
+            return View(vm);
+        }
+
+        try
+        {
+            await _emailService.SendContactEmailAsync(
+                toEmail: vm.SellerEmail,
+                toName: vm.SellerName,
+                fromEmail: vm.SenderEmail,
+                fromName: vm.SenderName,
+                subject: vm.Subject,
+                message: vm.Message,
+                adTitle: vm.AdTitle,
+                adId: vm.AdId
+            );
+
+            TempData["Success"] = "Ditt meddelande har skickats till säljaren!";
+            return RedirectToAction("Details", new { id = vm.AdId });
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError(string.Empty,
+                "Det gick inte att skicka meddelandet just nu. Försök igen senare.");
+            return View(vm);
+        }
     }
 }
