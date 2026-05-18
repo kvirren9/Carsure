@@ -215,6 +215,36 @@ body {
   display: block;
 }
 
+.ad-card-react__thumbs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 92px;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.7rem 0.9rem 0.35rem;
+  scrollbar-width: thin;
+}
+
+.ad-card-react__thumb {
+  border: 2px solid transparent;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ad-card-react__thumb img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.ad-card-react__thumb--active {
+  border-color: #1d4ed8;
+}
+
 .ad-card-react__content {
   display: grid;
   gap: 0.7rem;
@@ -347,6 +377,34 @@ body {
   background: #1e293b;
 }
 
+.ad-image-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 32vw);
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+}
+
+.ad-image-gallery__item {
+  margin: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  scroll-snap-align: start;
+}
+
+.ad-image-gallery__item img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
 .ads-empty-state {
   padding: 2.5rem;
   border: 1px dashed #cbd5e1;
@@ -379,6 +437,11 @@ body {
     margin: 0.85rem;
   }
 
+  .ad-card-react__thumbs {
+    grid-auto-columns: 76px;
+    padding: 0.6rem 0.75rem 0.2rem;
+  }
+
   .ad-card__header,
   .ad-card__footer {
     flex-direction: column;
@@ -387,5 +450,9 @@ body {
 
   .ad-card__link {
     width: 100%;
+  }
+
+  .ad-image-gallery {
+    grid-auto-columns: 84%;
   }
 }
