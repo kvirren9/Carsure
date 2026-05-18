@@ -204,7 +204,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  border-radius: 1.2rem;
+  border-radius: 0.6rem;
   overflow: hidden;
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -265,7 +265,7 @@ body {
 }
 
 .ad-card-react__button {
-  margin: 1rem;
+  margin: 0.5rem;
   margin-top: auto;
   display: inline-flex;
   align-items: center;
@@ -384,7 +384,7 @@ body {
   }
 
   .ad-card-react__button {
-    margin: 0.85rem;
+    margin: 10px;
   }
 
   .ad-card__header,

@@ -16,13 +16,13 @@ function truncate(text = "", maxLength = 105) {
 }
 
 function AdCard({ ad }) {
-  return React.createElement(
-    "article",
-    { className: "ad-card-react" },
+  const isClickable = !ad.hideDetailsButton;
+
+  const content = [
     ad.imageUrl
       ? React.createElement(
           "div",
-          { className: "ad-card-react__image-wrap" },
+          { className: "ad-card-react__image-wrap", key: "image" },
           React.createElement("img", {
             className: "ad-card-react__image",
             src: ad.imageUrl,
@@ -31,9 +31,10 @@ function AdCard({ ad }) {
           })
         )
       : null,
+
     React.createElement(
       "div",
-      { className: "ad-card-react__content" },
+      { className: "ad-card-react__content", key: "content" },
       React.createElement("h2", { className: "ad-card-react__title" }, ad.title),
       React.createElement(
         "p",
@@ -65,11 +66,23 @@ function AdCard({ ad }) {
         )
       )
     ),
-    React.createElement(
+  ];
+
+  if (isClickable) {
+    return React.createElement(
       "a",
-      { className: "ad-card-react__button", href: ad.detailsUrl },
-      "View Details"
-    )
+      {
+        className: "ad-card-react ad-card-react--clickable",
+        href: ad.detailsUrl,
+      },
+      content
+    );
+  }
+
+  return React.createElement(
+    "article",
+    { className: "ad-card-react" },
+    content
   );
 }
 
