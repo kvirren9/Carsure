@@ -15,4 +15,20 @@ public class Ad
 
     public int? UserId { get; set; }
     public User? User { get; set; }
+
+    public List<string> GetImageUrls(int maxCount = 10)
+    {
+        if (string.IsNullOrWhiteSpace(ImageUrl) || maxCount <= 0)
+            return new List<string>();
+
+        var parts = ImageUrl
+            .Split(new[] { '\r', '\n', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(maxCount)
+            .ToList();
+
+        return parts;
+    }
 }

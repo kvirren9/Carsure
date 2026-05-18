@@ -19,6 +19,7 @@
         year = ad.Car.Year,
         mileage = ad.Car.MileAge,
         imageUrl = ad.ImageUrl,
+        imageUrls = ad.GetImageUrls(),
         detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
     }).ToList();
 
@@ -30,7 +31,8 @@
         <div>
             <span class="ads-eyebrow">Marketplace</span>
             <h1 class="ads-title">Available car ads</h1>
-            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.</p>
+            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.
+            </p>
         </div>
     </div>
 
@@ -49,8 +51,8 @@
 
                 <div class="ads-filter-group">
                     <label class="ads-filter-label" for="Keyword">Sökord</label>
-                    <input class="ads-filter-input" type="text" id="Keyword" name="Keyword"
-                           value="@filters.Keyword" placeholder="Sök titel, märke…" />
+                    <input class="ads-filter-input" type="text" id="Keyword" name="Keyword" value="@filters.Keyword"
+                           placeholder="Sök titel, märke…" />
                 </div>
 
                 <div class="ads-filter-group">
@@ -111,7 +113,7 @@
                     </div>
                 </div>
 
-                <button class="ads-filter-submit" type="submit"Använd filter</button>
+                <button class="ads-filter-submit" type="submit">Använd filter</button>
             </form>
         </aside>
 

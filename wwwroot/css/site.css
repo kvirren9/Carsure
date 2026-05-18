@@ -223,6 +223,36 @@ body {
   display: block;
 }
 
+.ad-card-react__thumbs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 92px;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.7rem 0.9rem 0.35rem;
+  scrollbar-width: thin;
+}
+
+.ad-card-react__thumb {
+  border: 2px solid transparent;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ad-card-react__thumb img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.ad-card-react__thumb--active {
+  border-color: #1d4ed8;
+}
+
 .ad-card-react__content {
   display: grid;
   gap: 0.7rem;
@@ -325,6 +355,45 @@ body {
   line-height: 1.6;
 }
 
+.ad-card__contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+}
+
+.ad-card__contact-info {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.ad-card__contact-label {
+  color: #64748b;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ad-card__contact-email {
+  color: #0f172a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ad-card__contact-email:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.ad-card__contact--guest {
+  border-style: dashed;
+}
+
 .ad-card__price-label {
   color: #64748b;
   font-size: 0.85rem;
@@ -355,12 +424,110 @@ body {
   background: #1e293b;
 }
 
+.ad-image-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 32vw);
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+}
+
+.ad-image-gallery__item {
+  margin: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  scroll-snap-align: start;
+}
+
+.ad-image-gallery__item img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
 .ads-empty-state {
   padding: 2.5rem;
   border: 1px dashed #cbd5e1;
   border-radius: 1.25rem;
   background: #f8fafc;
   text-align: center;
+}
+
+.contact-seller-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.contact-seller-card {
+  width: min(860px, 100%);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.1rem;
+  padding: 1.35rem;
+  box-shadow: 0 0.8rem 1.8rem rgba(15, 23, 42, 0.07);
+}
+
+.contact-seller-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+.contact-seller-info__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-seller-info__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-seller-info__label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.contact-seller-info__value {
+  margin: 0;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.contact-seller-divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0.9rem 0 1.2rem;
+}
+
+.contact-seller-sender {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.92rem;
 }
 
 @media (max-width: 768px) {
@@ -387,8 +554,18 @@ body {
     margin: 10px;
   }
 
+  .ad-card-react__thumbs {
+    grid-auto-columns: 76px;
+    padding: 0.6rem 0.75rem 0.2rem;
+  }
+
   .ad-card__header,
   .ad-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ad-card__contact {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -396,128 +573,18 @@ body {
   .ad-card__link {
     width: 100%;
   }
-}
 
-/* ── Contact Seller – Details page block ─────────────────────────── */
-.ad-card__contact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0 0 1.25rem;
-  padding: 1rem 1.25rem;
-  background: #f0f7ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 0.85rem;
-}
-
-.ad-card__contact--guest {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
-.ad-card__contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.ad-card__contact-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #64748b;
-}
-
-.ad-card__contact-email {
-  font-size: 0.97rem;
-  font-weight: 600;
-  color: #1d4ed8;
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.ad-card__contact-email:hover {
-  text-decoration: underline;
-}
-
-/* ── Contact Seller – Dedicated form page ────────────────────────── */
-.contact-seller-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.contact-seller-card {
-  width: 100%;
-  max-width: 640px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 1.2rem;
-  padding: 2rem;
-  box-shadow: 0 0.85rem 2rem rgba(15, 23, 42, 0.08);
-}
-
-.contact-seller-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.contact-seller-info__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #eff6ff;
-  color: #1d4ed8;
-  flex-shrink: 0;
-}
-
-.contact-seller-info__label {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #64748b;
-}
-
-.contact-seller-info__value {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.contact-seller-divider {
-  border: none;
-  border-top: 1px solid #e2e8f0;
-  margin: 1.25rem 0 1.5rem;
-}
-
-.contact-seller-sender {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.65rem 0.9rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.6rem;
-  font-size: 0.88rem;
-  color: #475569;
-}
-
-@media (max-width: 576px) {
-  .ad-card__contact {
-    flex-direction: column;
-    align-items: flex-start;
+  .ad-image-gallery {
+    grid-auto-columns: 84%;
   }
 
   .contact-seller-card {
-    padding: 1.25rem;
+    padding: 1rem;
+  }
+
+  .contact-seller-sender {
+    display: flex;
+    width: 100%;
+    font-size: 0.85rem;
   }
 }

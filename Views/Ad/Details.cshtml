@@ -9,6 +9,8 @@
     var canDelete = isAdmin || isOwner;
     var isLoggedIn = currentUserId.HasValue;
     var canContact = isLoggedIn && !isOwner && Model.User != null;
+    var imageUrls = Model.GetImageUrls();
+
     var adCard = new[]
     {
         new
@@ -22,8 +24,10 @@
             year = Model.Car.Year,
             mileage = Model.Car.MileAge,
             imageUrl = Model.ImageUrl,
+            imageUrls,
             detailsUrl = Url.Action("Details", "Ad", new { id = Model.Id }),
-            hideDetailsButton = true
+            hideDetailsButton = true,
+            enableImagePicker = true
         }
     };
     var adCardJson = JsonSerializer.Serialize(adCard);
