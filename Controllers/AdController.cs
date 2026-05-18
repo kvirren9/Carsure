@@ -73,6 +73,7 @@ public class AdController : Controller
             Description = vm.Description,
             Price = vm.Price,
             Status = vm.Status,
+            ImageUrl = string.Join("\n", vm.GetImageUrls()),
             UserId = userId.Value,
             Car = car
         };
