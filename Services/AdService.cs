@@ -62,13 +62,29 @@ public class AdService
 
     public void UpdateAd(Ad ad)
     {
-        var existingAd = _dbContext.Ads.FirstOrDefault(a => a.Id == ad.Id);
+        var existingAd = _dbContext.Ads
+            .Include(a => a.Car)
+            .FirstOrDefault(a => a.Id == ad.Id);
         if (existingAd is null)
             return;
 
         existingAd.Title = ad.Title;
         existingAd.Description = ad.Description;
         existingAd.Price = ad.Price;
+        existingAd.Status = ad.Status;
+
+        if (existingAd.Car is not null && ad.Car is not null)
+        {
+            existingAd.Car.RegNumber = ad.Car.RegNumber;
+            existingAd.Car.Brand = ad.Car.Brand;
+            existingAd.Car.Model = ad.Car.Model;
+            existingAd.Car.Year = ad.Car.Year;
+            existingAd.Car.MileAge = ad.Car.MileAge;
+            existingAd.Car.FuelType = ad.Car.FuelType;
+            existingAd.Car.Transmission = ad.Car.Transmission;
+            existingAd.Car.Price = ad.Price;
+            existingAd.Car.Description = ad.Description;
+        }
 
         _dbContext.SaveChanges();
     }
