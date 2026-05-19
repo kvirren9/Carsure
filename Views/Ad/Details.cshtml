@@ -87,11 +87,16 @@
         @if (canDelete)
         {
             <div class="ad-card__footer">
-                <form asp-controller="Ad" asp-action="Delete" method="post"
-                      onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
-                    <input type="hidden" name="id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger btn-sm">Ta bort annons</button>
-                </form>
+                <div class="d-flex gap-2 align-items-center">
+                    <a asp-controller="Ad" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                        ✏️ Ändra annons
+                    </a>
+                    <form asp-controller="Ad" asp-action="Delete" method="post" class="d-inline"
+                          onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Ta bort annons</button>
+                    </form>
+                </div>
             </div>
         }
     </article>
