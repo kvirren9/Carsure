@@ -53,6 +53,16 @@ public class CreateAdViewModel : IValidatableObject
     [Display(Name = "Växellåda")]
     public string Transmission { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Stad är obligatoriskt")]
+    [StringLength(100)]
+    [Display(Name = "Stad")]
+    public string City { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Län är obligatoriskt")]
+    [StringLength(100)]
+    [Display(Name = "Län")]
+    public string Region { get; set; } = string.Empty;
+
     [Display(Name = "Bild-URL:er")]
     public string? ImageUrlsInput { get; set; }
 
