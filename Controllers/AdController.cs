@@ -88,6 +88,86 @@ public class AdController : Controller
         return RedirectToAction("Profile", "User");
     }
 
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        var isAdmin = UserController.IsAdmin(HttpContext.Session);
+
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        var ad = _adService.GetAdByIdAnyStatus(id);
+        if (ad is null)
+            return NotFound();
+
+        if (!_adService.CanModifyAd(id, userId.Value, isAdmin))
+            return Forbid();
+
+        var vm = new EditAdViewModel
+        {
+            Id = ad.Id,
+            Title = ad.Title,
+            Description = ad.Description,
+            Price = ad.Price,
+            Status = ad.Status,
+            RegNumber = ad.Car.RegNumber,
+            Brand = ad.Car.Brand,
+            Model = ad.Car.Model,
+            Year = ad.Car.Year,
+            MileAge = ad.Car.MileAge,
+            FuelType = ad.Car.FuelType,
+            Transmission = ad.Car.Transmission
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(EditAdViewModel vm)
+    {
+        var userId = UserController.GetLoggedInUserId(HttpContext.Session);
+        var isAdmin = UserController.IsAdmin(HttpContext.Session);
+
+        if (userId is null)
+            return RedirectToAction("Login", "User");
+
+        if (!_adService.CanModifyAd(vm.Id, userId.Value, isAdmin))
+            return Forbid();
+
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        var car = new Car
+        {
+            RegNumber = vm.RegNumber,
+            Brand = vm.Brand,
+            Model = vm.Model,
+            Year = vm.Year,
+            MileAge = vm.MileAge,
+            FuelType = vm.FuelType,
+            Transmission = vm.Transmission,
+            Price = vm.Price,
+            Description = vm.Description
+        };
+
+        var ad = new Ad
+        {
+            Id = vm.Id,
+            Title = vm.Title,
+            Description = vm.Description,
+            Price = vm.Price,
+            Status = vm.Status,
+            Car = car
+        };
+
+        _adService.UpdateAd(ad);
+
+        TempData["Success"] = "Annonsen har uppdaterats!";
+        return RedirectToAction("Details", new { id = vm.Id });
+    }
+
     [HttpPost]
     public IActionResult Delete(int id)
     {
