@@ -83,6 +83,9 @@
 
                 @if (canDelete)
                 {
+                    <a asp-controller="Ad" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                        ✏️ Ändra annons
+                    </a>
                     <form asp-controller="Ad" asp-action="Delete" method="post" class="d-inline"
                           onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
                         <input type="hidden" name="id" value="@Model.Id" />
