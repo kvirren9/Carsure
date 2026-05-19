@@ -9,4 +9,6 @@ public class AdSearchViewModel
     public int? MaxYear { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
+    public int? MinMileage { get; set; }
+    public int? MaxMileage { get; set; }
 }
