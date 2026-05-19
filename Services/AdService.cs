@@ -127,7 +127,15 @@ public class AdService
         if (filters.MaxPrice.HasValue)
             query = query.Where(a => a.Price <= filters.MaxPrice.Value);
 
-        return query.OrderByDescending(a => a.CreatedAt).ToList();
+        var results = query.OrderByDescending(a => a.CreatedAt).ToList();
+
+        if (filters.MinMileage.HasValue)
+            results = results.Where(a => int.TryParse(a.Car.MileAge, out var m) && m >= filters.MinMileage.Value).ToList();
+
+        if (filters.MaxMileage.HasValue)
+            results = results.Where(a => int.TryParse(a.Car.MileAge, out var m) && m <= filters.MaxMileage.Value).ToList();
+
+        return results;
     }
 
     public List<string> GetPublishedBrands() => _dbContext.Ads
