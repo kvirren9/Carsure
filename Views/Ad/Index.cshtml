@@ -43,9 +43,10 @@
                     <h2 class="ads-filter-title">Filter</h2>
                     @if (!string.IsNullOrWhiteSpace(filters.Keyword) || !string.IsNullOrWhiteSpace(filters.Brand) ||
                          !string.IsNullOrWhiteSpace(filters.Model) || filters.MinYear.HasValue || filters.MaxYear.HasValue ||
-                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue)
+                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue ||
+                         filters.MinMileage.HasValue || filters.MaxMileage.HasValue)
                     {
-                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Clear all</a>
+                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Rensa</a>
                     }
                 </div>
 
@@ -110,6 +111,17 @@
                         <span class="ads-filter-range-sep">–</span>
                         <input class="ads-filter-input" type="number" name="Max" placeholder="Max"
                                value="@filters.MaxPrice" min="0" />
+                    </div>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label">Miltal (km)</label>
+                    <div class="ads-filter-range">
+                        <input class="ads-filter-input" type="number" name="MinMileage" placeholder="Min"
+                               value="@filters.MinMileage" min="0" />
+                        <span class="ads-filter-range-sep">–</span>
+                        <input class="ads-filter-input" type="number" name="MaxMileage" placeholder="Max"
+                               value="@filters.MaxMileage" min="0" />
                     </div>
                 </div>
 
