@@ -14,6 +14,9 @@ public static class DbSeeder
             {
                 SeedCarsAndAds(dbContext);
             }
+
+            BackfillMissingAdImages(dbContext);
+            BackfillSampleAdGalleries(dbContext);
         }
         catch (Exception ex)
         {
@@ -54,12 +57,126 @@ public static class DbSeeder
         dbContext.SaveChanges();
 
         dbContext.Ads.AddRange(
-            new Ad { Title = "2019 Toyota Corolla", Description = "Well maintained, low mileage.", Price = 15000, CreatedAt = DateTime.UtcNow.AddDays(-5), CarId = car1.CarId, Status = AdStatus.PUBLISHED },
-            new Ad { Title = "2021 Ford Focus", Description = "One owner, full service history.", Price = 18500, CreatedAt = DateTime.UtcNow.AddDays(-2), CarId = car2.CarId, Status = AdStatus.PUBLISHED },
-            new Ad { Title = "2018 Honda Civic", Description = "Excellent condition, recently serviced.", Price = 17000, CreatedAt = DateTime.UtcNow.AddDays(-10), CarId = car3.CarId, Status = AdStatus.PUBLISHED },
-            new Ad { Title = "2020 Tesla Model 3", Description = "Like new, autopilot included.", Price = 35000, CreatedAt = DateTime.UtcNow.AddDays(-1), CarId = car4.CarId, Status = AdStatus.PUBLISHED }
+            new Ad
+            {
+                Title = "2019 Toyota Corolla",
+                Description = "Well maintained, low mileage.",
+                ImageUrl = string.Join("\n", new[]
+                {
+                    "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80"
+                }),
+                Price = 15000,
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                CarId = car1.CarId,
+                Status = AdStatus.PUBLISHED
+            },
+            new Ad
+            {
+                Title = "2021 Ford Focus",
+                Description = "One owner, full service history.",
+                ImageUrl = string.Join("\n", new[]
+                {
+                    "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
+                }),
+                Price = 18500,
+                CreatedAt = DateTime.UtcNow.AddDays(-2),
+                CarId = car2.CarId,
+                Status = AdStatus.PUBLISHED
+            },
+            new Ad { Title = "2018 Honda Civic", Description = "Excellent condition, recently serviced.", ImageUrl = "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80", Price = 17000, CreatedAt = DateTime.UtcNow.AddDays(-10), CarId = car3.CarId, Status = AdStatus.PUBLISHED },
+            new Ad { Title = "2020 Tesla Model 3", Description = "Like new, autopilot included.", ImageUrl = "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80", Price = 35000, CreatedAt = DateTime.UtcNow.AddDays(-1), CarId = car4.CarId, Status = AdStatus.PUBLISHED }
         );
 
         dbContext.SaveChanges();
+    }
+
+    private static void BackfillMissingAdImages(ApplicationDbContext dbContext)
+    {
+        var sampleImageUrls = new[]
+        {
+            "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80"
+        };
+
+        var adsWithoutImages = dbContext.Ads
+            .Where(a => string.IsNullOrWhiteSpace(a.ImageUrl))
+            .OrderBy(a => a.Id)
+            .ToList();
+
+        if (!adsWithoutImages.Any())
+            return;
+
+        for (var i = 0; i < adsWithoutImages.Count; i++)
+        {
+            adsWithoutImages[i].ImageUrl = sampleImageUrls[i % sampleImageUrls.Length];
+        }
+
+        dbContext.SaveChanges();
+    }
+
+    private static void BackfillSampleAdGalleries(ApplicationDbContext dbContext)
+    {
+        var sampleGalleries = new Dictionary<string, string[]>
+        {
+            ["2019 Toyota Corolla"] = new[]
+            {
+                "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80"
+            },
+            ["2021 Ford Focus"] = new[]
+            {
+                "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
+            }
+        };
+
+        var adsToUpdate = dbContext.Ads
+            .Where(a => sampleGalleries.Keys.Contains(a.Title))
+            .ToList();
+
+        if (!adsToUpdate.Any())
+            return;
+
+        var changed = false;
+
+        foreach (var ad in adsToUpdate)
+        {
+            var existingUrls = (ad.ImageUrl ?? string.Empty)
+                .Split(new[] { '\r', '\n', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            foreach (var url in sampleGalleries[ad.Title])
+            {
+                if (!existingUrls.Contains(url, StringComparer.OrdinalIgnoreCase))
+                {
+                    existingUrls.Add(url);
+                }
+            }
+
+            var normalized = existingUrls
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(10)
+                .ToList();
+
+            var merged = string.Join("\n", normalized);
+            if (!string.Equals(ad.ImageUrl, merged, StringComparison.Ordinal))
+            {
+                ad.ImageUrl = merged;
+                changed = true;
+            }
+        }
+
+        if (changed)
+            dbContext.SaveChanges();
     }
 }

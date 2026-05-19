@@ -15,13 +15,94 @@ function truncate(text = "", maxLength = 105) {
     : text;
 }
 
+function normalizeImageUrls(ad) {
+  if (Array.isArray(ad.imageUrls) && ad.imageUrls.length > 0) {
+    return ad.imageUrls.filter(Boolean).slice(0, 10);
+  }
+
+  if (typeof ad.imageUrl === "string" && ad.imageUrl.trim().length > 0) {
+    return ad.imageUrl
+      .split(/\r|\n|,|;/)
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .slice(0, 10);
+  }
+
+  return [];
+}
+
 function AdCard({ ad }) {
+  const imageUrls = normalizeImageUrls(ad);
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const primaryImage = imageUrls[selectedImageIndex] || imageUrls[0];
+  const showDetailsButton = !ad.hideDetailsButton;
+  const showImagePicker = !!ad.enableImagePicker && imageUrls.length > 1;
+
   return React.createElement(
     "article",
     { className: "ad-card-react" },
+    primaryImage
+      ? React.createElement(
+          React.Fragment,
+          null,
+          React.createElement(
+            "div",
+            { className: "ad-card-react__image-wrap" },
+            React.createElement("img", {
+              className: "ad-card-react__image",
+              src: primaryImage,
+              alt: ad.title,
+              loading: "lazy",
+            }),
+            showImagePicker
+              ? React.createElement("button", {
+                  type: "button",
+                  className: "ad-card-react__arrow ad-card-react__arrow--prev",
+                  onClick: () => setSelectedImageIndex((selectedImageIndex - 1 + imageUrls.length) % imageUrls.length),
+                  "aria-label": "Previous image",
+                }, "‹")
+              : null,
+            showImagePicker
+              ? React.createElement("button", {
+                  type: "button",
+                  className: "ad-card-react__arrow ad-card-react__arrow--next",
+                  onClick: () => setSelectedImageIndex((selectedImageIndex + 1) % imageUrls.length),
+                  "aria-label": "Next image",
+                }, "›")
+              : null
+          ),
+          showImagePicker
+            ? React.createElement(
+                "div",
+                { className: "ad-card-react__thumbs", role: "list", "aria-label": "Ad images" },
+                imageUrls.map((imageUrl, index) =>
+                  React.createElement(
+                    "button",
+                    {
+                      key: `${ad.id}-${index}`,
+                      type: "button",
+                      className:
+                        "ad-card-react__thumb" +
+                        (index === selectedImageIndex ? " ad-card-react__thumb--active" : ""),
+                      onClick: () => setSelectedImageIndex(index),
+                      "aria-label": `Show image ${index + 1}`,
+                      "aria-pressed": index === selectedImageIndex,
+                    },
+                    React.createElement("img", {
+                      src: imageUrl,
+                      alt: `${ad.title} image ${index + 1}`,
+                      loading: "lazy",
+                    })
+                  )
+                )
+              )
+            : null
+        )
+      : null,
+
     React.createElement(
       "div",
-      { className: "ad-card-react__content" },
+      { className: "ad-card-react__content", key: "content" },
       React.createElement("h2", { className: "ad-card-react__title" }, ad.title),
       React.createElement(
         "p",
@@ -53,11 +134,13 @@ function AdCard({ ad }) {
         )
       )
     ),
-    React.createElement(
-      "a",
-      { className: "ad-card-react__button", href: ad.detailsUrl },
-      "View Details"
-    )
+    showDetailsButton
+      ? React.createElement(
+          "a",
+          { className: "ad-card-react__button", href: ad.detailsUrl },
+          "View Details"
+        )
+      : null
   );
 }
 

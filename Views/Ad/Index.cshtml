@@ -18,7 +18,8 @@
         model = ad.Car.Model,
         year = ad.Car.Year,
         mileage = ad.Car.MileAge,
-        imageUrl = (string?)null,
+        imageUrl = ad.ImageUrl,
+        imageUrls = ad.GetImageUrls(),
         detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
     }).ToList();
 
@@ -30,7 +31,8 @@
         <div>
             <span class="ads-eyebrow">Marketplace</span>
             <h1 class="ads-title">Available car ads</h1>
-            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.</p>
+            <p class="ads-subtitle">Browse recent listings and compare price, condition, and posting date at a glance.
+            </p>
         </div>
     </div>
 
@@ -41,16 +43,17 @@
                     <h2 class="ads-filter-title">Filter</h2>
                     @if (!string.IsNullOrWhiteSpace(filters.Keyword) || !string.IsNullOrWhiteSpace(filters.Brand) ||
                          !string.IsNullOrWhiteSpace(filters.Model) || filters.MinYear.HasValue || filters.MaxYear.HasValue ||
-                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue)
+                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue ||
+                         filters.MinMileage.HasValue || filters.MaxMileage.HasValue)
                     {
-                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Clear all</a>
+                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Rensa</a>
                     }
                 </div>
 
                 <div class="ads-filter-group">
                     <label class="ads-filter-label" for="Keyword">Sökord</label>
-                    <input class="ads-filter-input" type="text" id="Keyword" name="Keyword"
-                           value="@filters.Keyword" placeholder="Sök titel, märke…" />
+                    <input class="ads-filter-input" type="text" id="Keyword" name="Keyword" value="@filters.Keyword"
+                           placeholder="Sök titel, märke…" />
                 </div>
 
                 <div class="ads-filter-group">
@@ -111,7 +114,18 @@
                     </div>
                 </div>
 
-                <button class="ads-filter-submit" type="submit"Använd filter</button>
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label">Miltal (km)</label>
+                    <div class="ads-filter-range">
+                        <input class="ads-filter-input" type="number" name="MinMileage" placeholder="Min"
+                               value="@filters.MinMileage" min="0" />
+                        <span class="ads-filter-range-sep">–</span>
+                        <input class="ads-filter-input" type="number" name="MaxMileage" placeholder="Max"
+                               value="@filters.MaxMileage" min="0" />
+                    </div>
+                </div>
+
+                <button class="ads-filter-submit" type="submit">Använd filter</button>
             </form>
         </aside>
 

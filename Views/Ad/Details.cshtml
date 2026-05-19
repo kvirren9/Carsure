@@ -1,4 +1,5 @@
 @model Carsure.Models.Ad
+@using System.Text.Json
 
 @{
     ViewData["Title"] = Model.Title;
@@ -8,17 +9,33 @@
     var canDelete = isAdmin || isOwner;
     var isLoggedIn = currentUserId.HasValue;
     var canContact = isLoggedIn && !isOwner && Model.User != null;
+    var imageUrls = Model.GetImageUrls();
+
+    var adCard = new[]
+    {
+        new
+        {
+            id = Model.Id,
+            title = Model.Title,
+            price = Model.Price,
+            shortDescription = Model.Description,
+            brand = Model.Car.Brand,
+            model = Model.Car.Model,
+            year = Model.Car.Year,
+            mileage = Model.Car.MileAge,
+            imageUrl = Model.ImageUrl,
+            imageUrls,
+            detailsUrl = Url.Action("Details", "Ad", new { id = Model.Id }),
+            hideDetailsButton = true,
+            enableImagePicker = true
+        }
+    };
+    var adCardJson = JsonSerializer.Serialize(adCard);
 }
 
-<section class="ads-page">
-    <div class="ads-hero">
-        <div>
-            <span class="ads-eyebrow">Ad details</span>
-            <h1 class="ads-title">@Model.Title</h1>
-            <p class="ads-subtitle">Posted on @Model.CreatedAt.ToString("dd MMM yyyy")</p>
-        </div>
-    </div>
+<section class="ads-page mb-5">
 
+    
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success">@TempData["Success"]</div>
@@ -28,16 +45,11 @@
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <article class="ad-card">
-        <div class="ad-card__body">
-            <h2 class="ad-card__title">Description</h2>
-            <p class="ad-card__description">@Model.Description</p>
-            @if (Model.User != null)
-            {
-                <p class="text-muted small">Posted by: @Model.User.Name</p>
-            }
-        </div>
+    <div id="ad-list-react-root"></div>
 
+    <article class="ad-card mt-4">
+
+        
         @if (canContact)
         {
             <div class="ad-card__contact">
@@ -72,27 +84,21 @@
             </div>
         }
 
-        <div class="ad-card__footer">
-            <div>
-                <div class="ad-card__price-label">Price</div>
-                <div class="ad-card__price">@Model.Price.ToString("C")</div>
+        @if (canDelete)
+        {
+            <div class="ad-card__footer">
+                <form asp-controller="Ad" asp-action="Delete" method="post"
+                      onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">Ta bort annons</button>
+                </form>
             </div>
-
-            <div class="d-flex gap-2 align-items-center">
-                <a asp-controller="Ad" asp-action="Index" class="ad-card__link">Back to ads</a>
-
-                @if (canDelete)
-                {
-                    <a asp-controller="Ad" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
-                        ✏️ Ändra annons
-                    </a>
-                    <form asp-controller="Ad" asp-action="Delete" method="post" class="d-inline"
-                          onsubmit="return confirm('Är du säker på att du vill ta bort denna annons?');">
-                        <input type="hidden" name="id" value="@Model.Id" />
-                        <button type="submit" class="btn btn-danger btn-sm">Ta bort annons</button>
-                    </form>
-                }
-            </div>
-        </div>
+        }
     </article>
 </section>
+
+<script>window.__adListData = @Html.Raw(adCardJson);</script>
+
+@section Scripts {
+    <script type="module" src="~/dist/ad-card-list.js" asp-append-version="true"></script>
+}
