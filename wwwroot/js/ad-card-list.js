@@ -53,7 +53,23 @@ function AdCard({ ad }) {
               src: primaryImage,
               alt: ad.title,
               loading: "lazy",
-            })
+            }),
+            showImagePicker
+              ? React.createElement("button", {
+                  type: "button",
+                  className: "ad-card-react__arrow ad-card-react__arrow--prev",
+                  onClick: () => setSelectedImageIndex((selectedImageIndex - 1 + imageUrls.length) % imageUrls.length),
+                  "aria-label": "Previous image",
+                }, "‹")
+              : null,
+            showImagePicker
+              ? React.createElement("button", {
+                  type: "button",
+                  className: "ad-card-react__arrow ad-card-react__arrow--next",
+                  onClick: () => setSelectedImageIndex((selectedImageIndex + 1) % imageUrls.length),
+                  "aria-label": "Next image",
+                }, "›")
+              : null
           ),
           showImagePicker
             ? React.createElement(
