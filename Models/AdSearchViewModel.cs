@@ -11,4 +11,6 @@ public class AdSearchViewModel
     public decimal? MaxPrice { get; set; }
     public int? MinMileage { get; set; }
     public int? MaxMileage { get; set; }
+    public string? City { get; set; }
+    public string? Region { get; set; }
 }

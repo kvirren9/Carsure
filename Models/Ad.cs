@@ -10,6 +10,9 @@ public class Ad
     public DateTime CreatedAt { get; set; }
     public AdStatus Status { get; set; } = AdStatus.DRAFT;
 
+    public string? City { get; set; }
+    public string? Region { get; set; }
+
     public int CarId { get; set; }
     public Car Car { get; set; } = null!;
 

@@ -7,6 +7,8 @@
     var filters = ViewBag.Filters as AdSearchViewModel ?? new AdSearchViewModel();
     var brands = ViewBag.Brands as List<string> ?? new List<string>();
     var models = ViewBag.Models as List<string> ?? new List<string>();
+    var cities = ViewBag.Cities as List<string> ?? new List<string>();
+    var regions = ViewBag.Regions as List<string> ?? new List<string>();
 
     var adCards = Model.Select(ad => new
     {
@@ -18,6 +20,8 @@
         model = ad.Car.Model,
         year = ad.Car.Year,
         mileage = ad.Car.MileAge,
+        city = ad.City,
+        region = ad.Region,
         imageUrl = ad.ImageUrl,
         imageUrls = ad.GetImageUrls(),
         detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
@@ -44,7 +48,8 @@
                     @if (!string.IsNullOrWhiteSpace(filters.Keyword) || !string.IsNullOrWhiteSpace(filters.Brand) ||
                          !string.IsNullOrWhiteSpace(filters.Model) || filters.MinYear.HasValue || filters.MaxYear.HasValue ||
                          filters.MinPrice.HasValue || filters.MaxPrice.HasValue ||
-                         filters.MinMileage.HasValue || filters.MaxMileage.HasValue)
+                         filters.MinMileage.HasValue || filters.MaxMileage.HasValue ||
+                         !string.IsNullOrWhiteSpace(filters.City) || !string.IsNullOrWhiteSpace(filters.Region))
                     {
                         <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Rensa</a>
                     }
@@ -123,6 +128,42 @@
                         <input class="ads-filter-input" type="number" name="MaxMileage" placeholder="Max"
                                value="@filters.MaxMileage" min="0" />
                     </div>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="City">Stad</label>
+                    <select class="ads-filter-select" id="City" name="City">
+                        <option value="">Alla städer</option>
+                        @foreach (var city in cities)
+                        {
+                            if (filters.City == city)
+                            {
+                                <option value="@city" selected>@city</option>
+                            }
+                            else
+                            {
+                                <option value="@city">@city</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="Region">Län</label>
+                    <select class="ads-filter-select" id="Region" name="Region">
+                        <option value="">Alla län</option>
+                        @foreach (var region in regions)
+                        {
+                            if (filters.Region == region)
+                            {
+                                <option value="@region" selected>@region</option>
+                            }
+                            else
+                            {
+                                <option value="@region">@region</option>
+                            }
+                        }
+                    </select>
                 </div>
 
                 <button class="ads-filter-submit" type="submit">Använd filter</button>
