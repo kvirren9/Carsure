@@ -72,6 +72,8 @@ public class AdService
         existingAd.Description = ad.Description;
         existingAd.Price = ad.Price;
         existingAd.Status = ad.Status;
+        existingAd.City = ad.City;
+        existingAd.Region = ad.Region;
 
         if (existingAd.Car is not null && ad.Car is not null)
         {
@@ -151,8 +153,28 @@ public class AdService
         if (filters.MaxMileage.HasValue)
             results = results.Where(a => int.TryParse(a.Car.MileAge, out var m) && m <= filters.MaxMileage.Value).ToList();
 
+        if (!string.IsNullOrWhiteSpace(filters.City))
+            results = results.Where(a => a.City != null && a.City.ToLower() == filters.City.ToLower()).ToList();
+
+        if (!string.IsNullOrWhiteSpace(filters.Region))
+            results = results.Where(a => a.Region != null && a.Region.ToLower() == filters.Region.ToLower()).ToList();
+
         return results;
     }
+
+    public List<string> GetPublishedCities() => _dbContext.Ads
+        .Where(a => a.Status == AdStatus.PUBLISHED && a.City != null && a.City != "")
+        .Select(a => a.City!)
+        .Distinct()
+        .OrderBy(c => c)
+        .ToList();
+
+    public List<string> GetPublishedRegions() => _dbContext.Ads
+        .Where(a => a.Status == AdStatus.PUBLISHED && a.Region != null && a.Region != "")
+        .Select(a => a.Region!)
+        .Distinct()
+        .OrderBy(r => r)
+        .ToList();
 
     public List<string> GetPublishedBrands() => _dbContext.Ads
         .Where(a => a.Status == AdStatus.PUBLISHED)

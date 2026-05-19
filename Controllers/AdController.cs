@@ -22,6 +22,8 @@ public class AdController : Controller
         var ads = _adService.SearchAds(filters);
         ViewBag.Brands = _adService.GetPublishedBrands();
         ViewBag.Models = _adService.GetPublishedModels(filters.Brand);
+        ViewBag.Cities = _adService.GetPublishedCities();
+        ViewBag.Regions = _adService.GetPublishedRegions();
         ViewBag.Filters = filters;
         return View(ads);
     }
@@ -79,6 +81,8 @@ public class AdController : Controller
             Status = vm.Status,
             ImageUrl = string.Join("\n", vm.GetImageUrls()),
             UserId = userId.Value,
+            City = vm.City.Trim(),
+            Region = vm.Region.Trim(),
             Car = car
         };
 
@@ -117,7 +121,9 @@ public class AdController : Controller
             Year = ad.Car.Year,
             MileAge = ad.Car.MileAge,
             FuelType = ad.Car.FuelType,
-            Transmission = ad.Car.Transmission
+            Transmission = ad.Car.Transmission,
+            City = ad.City ?? string.Empty,
+            Region = ad.Region ?? string.Empty
         };
 
         return View(vm);
@@ -159,6 +165,8 @@ public class AdController : Controller
             Description = vm.Description,
             Price = vm.Price,
             Status = vm.Status,
+            City = vm.City.Trim(),
+            Region = vm.Region.Trim(),
             Car = car
         };
 
