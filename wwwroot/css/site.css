@@ -330,6 +330,12 @@ body {
   gap: 1rem;
 }
 
+.ad-card__footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
 .ad-card__badge {
   font-size: 0.8rem;
 }
