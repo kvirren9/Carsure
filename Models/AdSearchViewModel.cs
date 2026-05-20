@@ -13,15 +13,9 @@ public class AdSearchViewModel
     public int? MaxMileage { get; set; }
     public string? City { get; set; }
     public string? Region { get; set; }
-
-    // New filters
     public string? FuelType { get; set; }
     public string? Transmission { get; set; }
-
-    // Sorting: "price_asc", "price_desc", "date_desc" (default), "date_asc", "mileage_asc", "mileage_desc"
     public string? SortBy { get; set; }
-
-    // Pagination
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 12;
 }
