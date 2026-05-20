@@ -109,7 +109,7 @@ public class AdService
         return ad?.UserId == userId;
     }
 
-    public IReadOnlyList<Ad> SearchAds(AdSearchViewModel filters)
+    public PagedResult<Ad> SearchAds(AdSearchViewModel filters)
     {
         var query = _dbContext.Ads
             .Where(a => a.Status == AdStatus.PUBLISHED)
@@ -145,7 +145,13 @@ public class AdService
         if (filters.MaxPrice.HasValue)
             query = query.Where(a => a.Price <= filters.MaxPrice.Value);
 
-        var results = query.OrderByDescending(a => a.CreatedAt).ToList();
+        if (!string.IsNullOrWhiteSpace(filters.FuelType))
+            query = query.Where(a => a.Car.FuelType.ToLower() == filters.FuelType.ToLower());
+
+        if (!string.IsNullOrWhiteSpace(filters.Transmission))
+            query = query.Where(a => a.Car.Transmission.ToLower() == filters.Transmission.ToLower());
+
+        var results = query.ToList();
 
         if (filters.MinMileage.HasValue)
             results = results.Where(a => int.TryParse(a.Car.MileAge, out var m) && m >= filters.MinMileage.Value).ToList();
@@ -159,7 +165,29 @@ public class AdService
         if (!string.IsNullOrWhiteSpace(filters.Region))
             results = results.Where(a => a.Region != null && a.Region.ToLower() == filters.Region.ToLower()).ToList();
 
-        return results;
+        // Sorting
+        results = filters.SortBy switch
+        {
+            "price_asc" => results.OrderBy(a => a.Price).ToList(),
+            "price_desc" => results.OrderByDescending(a => a.Price).ToList(),
+            "date_asc" => results.OrderBy(a => a.CreatedAt).ToList(),
+            "mileage_asc" => results.OrderBy(a => int.TryParse(a.Car.MileAge, out var m) ? m : int.MaxValue).ToList(),
+            "mileage_desc" => results.OrderByDescending(a => int.TryParse(a.Car.MileAge, out var m) ? m : -1).ToList(),
+            _ => results.OrderByDescending(a => a.CreatedAt).ToList(),
+        };
+
+        var pageSize = filters.PageSize > 0 ? filters.PageSize : 12;
+        var page = filters.Page > 0 ? filters.Page : 1;
+        var totalCount = results.Count;
+        var items = results.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        return new PagedResult<Ad>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public List<string> GetPublishedCities() => _dbContext.Ads
