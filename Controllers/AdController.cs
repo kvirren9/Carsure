@@ -19,13 +19,14 @@ public class AdController : Controller
 
     public IActionResult Index(AdSearchViewModel filters)
     {
-        var ads = _adService.SearchAds(filters);
+        var pagedResult = _adService.SearchAds(filters);
         ViewBag.Brands = _adService.GetPublishedBrands();
         ViewBag.Models = _adService.GetPublishedModels(filters.Brand);
         ViewBag.Cities = _adService.GetPublishedCities();
         ViewBag.Regions = _adService.GetPublishedRegions();
         ViewBag.Filters = filters;
-        return View(ads);
+        ViewBag.PagedResult = pagedResult;
+        return View(pagedResult.Items);
     }
 
     public IActionResult Details(int id)
