@@ -3,12 +3,28 @@
 @using Carsure.Models
 
 @{
-    ViewData["Title"] = "Ads";
-    var filters = ViewBag.Filters as AdSearchViewModel ?? new AdSearchViewModel();
-    var brands = ViewBag.Brands as List<string> ?? new List<string>();
-    var models = ViewBag.Models as List<string> ?? new List<string>();
-    var cities = ViewBag.Cities as List<string> ?? new List<string>();
-    var regions = ViewBag.Regions as List<string> ?? new List<string>();
+    ViewData[index: "Title"] = "Ads";
+    AdSearchViewModel? filters = ViewBag.Filters as AdSearchViewModel ?? new AdSearchViewModel();
+    List<string>? brands = ViewBag.Brands as List<string> ?? new List<string>();
+    List<string>? models = ViewBag.Models as List<string> ?? new List<string>();
+    List<string>? cities = ViewBag.Cities as List<string> ?? new List<string>();
+    List<string>? regions = ViewBag.Regions as List<string> ?? new List<string>();
+    PagedResult<Ad>? paged = ViewBag.PagedResult as PagedResult<Ad> ?? new PagedResult<Ad>();
+
+    string[]? fuelTypes = new[] { "Bensin", "Diesel", "El", "Hybrid" };
+    string[]? transmissions = new[] { "Manuell", "Automat" };
+
+    bool hasActiveFilters =
+        !string.IsNullOrWhiteSpace(filters.Keyword) ||
+        !string.IsNullOrWhiteSpace(filters.Brand) ||
+        !string.IsNullOrWhiteSpace(filters.Model) ||
+        filters.MinYear.HasValue || filters.MaxYear.HasValue ||
+        filters.MinPrice.HasValue || filters.MaxPrice.HasValue ||
+        filters.MinMileage.HasValue || filters.MaxMileage.HasValue ||
+        !string.IsNullOrWhiteSpace(filters.City) ||
+        !string.IsNullOrWhiteSpace(filters.Region) ||
+        !string.IsNullOrWhiteSpace(filters.FuelType) ||
+        !string.IsNullOrWhiteSpace(filters.Transmission);
 
     var adCards = Model.Select(ad => new
     {
@@ -24,10 +40,32 @@
         region = ad.Region,
         imageUrl = ad.ImageUrl,
         imageUrls = ad.GetImageUrls(),
-        detailsUrl = Url.Action("Details", "Ad", new { id = ad.Id })
+        detailsUrl = Url.Action(action: "Details", controller: "Ad", new { id = ad.Id })
     }).ToList();
 
-    var adCardsJson = JsonSerializer.Serialize(adCards);
+    string? adCardsJson = JsonSerializer.Serialize(adCards);
+
+    string PageUrl(int page)
+    {
+        List<string>? parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(filters.Keyword)) parts.Add("Keyword=" + Uri.EscapeDataString(filters.Keyword!));
+        if (!string.IsNullOrWhiteSpace(filters.Brand)) parts.Add("Brand=" + Uri.EscapeDataString(filters.Brand!));
+        if (!string.IsNullOrWhiteSpace(filters.Model)) parts.Add("Model=" + Uri.EscapeDataString(filters.Model!));
+        if (filters.MinYear.HasValue) parts.Add("MinYear=" + filters.MinYear);
+        if (filters.MaxYear.HasValue) parts.Add("MaxYear=" + filters.MaxYear);
+        if (filters.MinPrice.HasValue) parts.Add("MinPrice=" + filters.MinPrice);
+        if (filters.MaxPrice.HasValue) parts.Add("MaxPrice=" + filters.MaxPrice);
+        if (filters.MinMileage.HasValue) parts.Add("MinMileage=" + filters.MinMileage);
+        if (filters.MaxMileage.HasValue) parts.Add("MaxMileage=" + filters.MaxMileage);
+        if (!string.IsNullOrWhiteSpace(filters.City)) parts.Add("City=" + Uri.EscapeDataString(filters.City!));
+        if (!string.IsNullOrWhiteSpace(filters.Region)) parts.Add("Region=" + Uri.EscapeDataString(filters.Region!));
+        if (!string.IsNullOrWhiteSpace(filters.FuelType)) parts.Add("FuelType=" + Uri.EscapeDataString(filters.FuelType!));
+        if (!string.IsNullOrWhiteSpace(filters.Transmission)) parts.Add("Transmission=" +
+Uri.EscapeDataString(filters.Transmission!));
+        if (!string.IsNullOrWhiteSpace(filters.SortBy)) parts.Add("SortBy=" + Uri.EscapeDataString(filters.SortBy!));
+        parts.Add("Page=" + page);
+        return Url.Action(action: "Index", controller: "Ad") + "?" + string.Join(separator: "&", parts);
+    }
 }
 
 <section class="ads-page">
@@ -43,15 +81,13 @@
     <div class="ads-layout">
         <aside class="ads-filters">
             <form method="get" action="@Url.Action("Index", "Ad")" class="ads-filter-form">
+                <input type="hidden" name="Page" value="1" />
+
                 <div class="ads-filter-header">
                     <h2 class="ads-filter-title">Filter</h2>
-                    @if (!string.IsNullOrWhiteSpace(filters.Keyword) || !string.IsNullOrWhiteSpace(filters.Brand) ||
-                         !string.IsNullOrWhiteSpace(filters.Model) || filters.MinYear.HasValue || filters.MaxYear.HasValue ||
-                         filters.MinPrice.HasValue || filters.MaxPrice.HasValue ||
-                         filters.MinMileage.HasValue || filters.MaxMileage.HasValue ||
-                         !string.IsNullOrWhiteSpace(filters.City) || !string.IsNullOrWhiteSpace(filters.Region))
+                    @if (hasActiveFilters)
                     {
-                        <a href="@Url.Action("Index", "Ad")" class="ads-filter-clear">Rensa</a>
+                        <a href="@Url.Action(action: "Index", controller: "Ad")" class="ads-filter-clear">Rensa</a>
                     }
                 </div>
 
@@ -65,11 +101,11 @@
                     <label class="ads-filter-label" for="Brand">Märke</label>
                     <select class="ads-filter-select" id="Brand" name="Brand">
                         <option value="">Alla</option>
-                        @foreach (var brand in brands)
+                        @foreach (string brand in brands)
                         {
                             if (filters.Brand == brand)
                             {
-                                <option value="@brand" selected>@brand</option>
+                                <option value="@brand" selected="selected">@brand</option>
                             }
                             else
                             {
@@ -80,14 +116,14 @@
                 </div>
 
                 <div class="ads-filter-group">
-                    <label class="ads-filter-label" for="Modell">Model</label>
+                    <label class="ads-filter-label" for="Model">Modell</label>
                     <select class="ads-filter-select" id="Model" name="Model">
                         <option value="">Alla modeller</option>
-                        @foreach (var m in models)
+                        @foreach (string m in models)
                         {
                             if (filters.Model == m)
                             {
-                                <option value="@m" selected>@m</option>
+                                <option value="@m" selected="selected">@m</option>
                             }
                             else
                             {
@@ -100,10 +136,10 @@
                 <div class="ads-filter-group">
                     <label class="ads-filter-label">Årsmodell</label>
                     <div class="ads-filter-range">
-                        <input class="ads-filter-input" type="number" name="Min" placeholder="Från"
+                        <input class="ads-filter-input" type="number" name="MinYear" placeholder="Från"
                                value="@filters.MinYear" min="1900" max="2100" />
                         <span class="ads-filter-range-sep">–</span>
-                        <input class="ads-filter-input" type="number" name="Max" placeholder="Till"
+                        <input class="ads-filter-input" type="number" name="MaxYear" placeholder="Till"
                                value="@filters.MaxYear" min="1900" max="2100" />
                     </div>
                 </div>
@@ -111,10 +147,10 @@
                 <div class="ads-filter-group">
                     <label class="ads-filter-label">Pris (SEK)</label>
                     <div class="ads-filter-range">
-                        <input class="ads-filter-input" type="number" name="Min" placeholder="Min"
+                        <input class="ads-filter-input" type="number" name="MinPrice" placeholder="Min"
                                value="@filters.MinPrice" min="0" />
                         <span class="ads-filter-range-sep">–</span>
-                        <input class="ads-filter-input" type="number" name="Max" placeholder="Max"
+                        <input class="ads-filter-input" type="number" name="MaxPrice" placeholder="Max"
                                value="@filters.MaxPrice" min="0" />
                     </div>
                 </div>
@@ -131,14 +167,50 @@
                 </div>
 
                 <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="FuelType">Bränsletyp</label>
+                    <select class="ads-filter-select" id="FuelType" name="FuelType">
+                        <option value="">Alla bränsletyper</option>
+                        @foreach (string ft in fuelTypes)
+                        {
+                            if (filters.FuelType == ft)
+                            {
+                                <option value="@ft" selected="selected">@ft</option>
+                            }
+                            else
+                            {
+                                <option value="@ft">@ft</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="ads-filter-group">
+                    <label class="ads-filter-label" for="Transmission">Växellåda</label>
+                    <select class="ads-filter-select" id="Transmission" name="Transmission">
+                        <option value="">Alla växellådor</option>
+                        @foreach (string tr in transmissions)
+                        {
+                            if (filters.Transmission == tr)
+                            {
+                                <option value="@tr" selected="selected">@tr</option>
+                            }
+                            else
+                            {
+                                <option value="@tr">@tr</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="ads-filter-group">
                     <label class="ads-filter-label" for="City">Stad</label>
                     <select class="ads-filter-select" id="City" name="City">
                         <option value="">Alla städer</option>
-                        @foreach (var city in cities)
+                        @foreach (string city in cities)
                         {
                             if (filters.City == city)
                             {
-                                <option value="@city" selected>@city</option>
+                                <option value="@city" selected="selected">@city</option>
                             }
                             else
                             {
@@ -152,11 +224,11 @@
                     <label class="ads-filter-label" for="Region">Län</label>
                     <select class="ads-filter-select" id="Region" name="Region">
                         <option value="">Alla län</option>
-                        @foreach (var region in regions)
+                        @foreach (string region in regions)
                         {
                             if (filters.Region == region)
                             {
-                                <option value="@region" selected>@region</option>
+                                <option value="@region" selected="selected">@region</option>
                             }
                             else
                             {
@@ -179,12 +251,173 @@
             }
             else
             {
-                <p class="ads-result-count">@Model.Count() result@(Model.Count() == 1 ? "" : "s") found</p>
+                <div class="ads-results-toolbar">
+                    <p class="ads-result-count">
+                        @{
+                            int from = ((paged.Page - 1) * paged.PageSize) + 1;
+                            int to = Math.Min(paged.Page * paged.PageSize, paged.TotalCount);
+                            int total = paged.TotalCount;
+                        }
+                        Visar @from–@to av @total annons@(total == 1 ? "" : "er")
+                    </p>
+
+                    <form method="get" action="@Url.Action("Index", "Ad")" class="ads-sort-form">
+                        @if (!string.IsNullOrWhiteSpace(filters.Keyword))
+                        {
+                            <input type="hidden" name="Keyword" value="@filters.Keyword" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.Brand))
+                        {
+                            <input type="hidden" name="Brand" value="@filters.Brand" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.Model))
+                        {
+                            <input type="hidden" name="Model" value="@filters.Model" />
+                        }
+                        @if (filters.MinYear.HasValue)
+                        {
+                            <input type="hidden" name="MinYear" value="@filters.MinYear" />
+                        }
+                        @if (filters.MaxYear.HasValue)
+                        {
+                            <input type="hidden" name="MaxYear" value="@filters.MaxYear" />
+                        }
+                        @if (filters.MinPrice.HasValue)
+                        {
+                            <input type="hidden" name="MinPrice" value="@filters.MinPrice" />
+                        }
+                        @if (filters.MaxPrice.HasValue)
+                        {
+                            <input type="hidden" name="MaxPrice" value="@filters.MaxPrice" />
+                        }
+                        @if (filters.MinMileage.HasValue)
+                        {
+                            <input type="hidden" name="MinMileage" value="@filters.MinMileage" />
+                        }
+                        @if (filters.MaxMileage.HasValue)
+                        {
+                            <input type="hidden" name="MaxMileage" value="@filters.MaxMileage" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.City))
+                        {
+                            <input type="hidden" name="City" value="@filters.City" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.Region))
+                        {
+                            <input type="hidden" name="Region" value="@filters.Region" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.FuelType))
+                        {
+                            <input type="hidden" name="FuelType" value="@filters.FuelType" />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(filters.Transmission))
+                        {
+                            <input type="hidden" name="Transmission" value="@filters.Transmission" />
+                        }
+                        <input type="hidden" name="Page" value="1" />
+
+                        @{
+                            string sort = filters.SortBy ?? "";
+                        }
+                        <label class="ads-sort-label" for="SortBy">Sortera:</label>
+                        <select class="ads-sort-select" id="SortBy" name="SortBy" onchange="this.form.submit()">
+                            @if (sort == "" || sort == "date_desc")
+                            {
+                                <option value="" selected="selected">Nyast först</option>
+                            }
+                            else
+                            {
+                                <option value="">Nyast först</option>
+                            }
+                            @if (sort == "date_asc")
+                            {
+                                <option value="date_asc" selected="selected">Äldst först</option>
+                            }
+                            else
+                            {
+                                <option value="date_asc">Äldst först</option>
+                            }
+                            @if (sort == "price_asc")
+                            {
+                                <option value="price_asc" selected="selected">Pris: lågt → högt</option>
+                            }
+                            else
+                            {
+                                <option value="price_asc">Pris: lågt → högt</option>
+                            }
+                            @if (sort == "price_desc")
+                            {
+                                <option value="price_desc" selected="selected">Pris: högt → lågt</option>
+                            }
+                            else
+                            {
+                                <option value="price_desc">Pris: högt → lågt</option>
+                            }
+                            @if (sort == "mileage_asc")
+                            {
+                                <option value="mileage_asc" selected="selected">Miltal: lågt → högt</option>
+                            }
+                            else
+                            {
+                                <option value="mileage_asc">Miltal: lågt → högt</option>
+                            }
+                            @if (sort == "mileage_desc")
+                            {
+                                <option value="mileage_desc" selected="selected">Miltal: högt → lågt</option>
+                            }
+                            else
+                            {
+                                <option value="mileage_desc">Miltal: högt → lågt</option>
+                            }
+                        </select>
+                    </form>
+                </div>
+
                 <div id="ad-list-react-root"></div>
+
+                @if (paged.TotalPages > 1)
+                {
+                    <nav class="ads-pagination" aria-label="Sidnavigering">
+                        @if (paged.HasPreviousPage)
+                        {
+                            <a class="ads-pagination__btn" href="@PageUrl(paged.Page - 1)">&#8249; Föregående</a>
+                        }
+                        else
+                        {
+                            <span class="ads-pagination__btn ads-pagination__btn--disabled">&#8249; Föregående</span>
+                        }
+
+                        @for (int p = 1; p <= paged.TotalPages; p++)
+                        {
+                            if (p == paged.Page)
+                            {
+                                <span class="ads-pagination__page ads-pagination__page--active">@p</span>
+                            }
+                            else if (p == 1 || p == paged.TotalPages || Math.Abs(p - paged.Page) <= 2)
+                            {
+                                <a class="ads-pagination__page" href="@PageUrl(p)">@p</a>
+                            }
+                            else if (Math.Abs(p - paged.Page) == 3)
+                            {
+                                <span class="ads-pagination__ellipsis">&#8230;</span>
+                            }
+                        }
+
+                        @if (paged.HasNextPage)
+                        {
+                            <a class="ads-pagination__btn" href="@PageUrl(paged.Page + 1)">Nästa &#8250;</a>
+                        }
+                        else
+                        {
+                            <span class="ads-pagination__btn ads-pagination__btn--disabled">Nästa &#8250;</span>
+                        }
+                    </nav>
+                }
             }
         </div>
     </div>
 </section>
+
 <script>window.__adListData = @Html.Raw(adCardsJson);</script>
 
 @section Scripts {

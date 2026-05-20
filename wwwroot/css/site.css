@@ -629,3 +629,133 @@ body {
     font-size: 0.85rem;
   }
 }
+
+.ads-results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.ads-results-toolbar .ads-result-count {
+  margin: 0;
+}
+
+.ads-sort-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ads-sort-label {
+  font-size: 0.85rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.ads-sort-select {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ads-sort-select:focus {
+  border-color: #1d4ed8;
+}
+
+.ads-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ads-pagination__btn,
+.ads-pagination__page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.65rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.ads-pagination__btn {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.ads-pagination__btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.ads-pagination__btn--disabled {
+  background: #f8fafc;
+  color: #cbd5e1;
+  border: 1px solid #e2e8f0;
+  cursor: default;
+  pointer-events: none;
+}
+
+.ads-pagination__page {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.ads-pagination__page:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  text-decoration: none;
+}
+
+.ads-pagination__page--active {
+  background: #1e293b;
+  color: #fff;
+  border-color: #1e293b;
+  cursor: default;
+  pointer-events: none;
+}
+
+.ads-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 576px) {
+  .ads-results-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ads-pagination__btn {
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+  }
+}
