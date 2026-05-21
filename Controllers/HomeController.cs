@@ -1,21 +1,29 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Carsure.Models;
+using Carsure.Services;
 
 namespace Carsure.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly AdService _adService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, AdService adService)
     {
         _logger = logger;
+        _adService = adService;
     }
 
     public IActionResult Index()
     {
-        return View();
+        var latestAds = _adService
+            .GetAds()
+            .Take(4)
+            .ToList();
+
+        return View(latestAds);
     }
 
     public IActionResult Privacy()
