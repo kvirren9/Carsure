@@ -4,19 +4,28 @@ namespace Carsure.Data;
 
 public static class DbSeeder
 {
+    private sealed record SeedAdData(
+        string RegNumber,
+        string Brand,
+        string Model,
+        int Year,
+        string Mileage,
+        string FuelType,
+        string Transmission,
+        decimal Price,
+        string Title,
+        string Description,
+        string City,
+        string Region,
+        int CreatedDaysAgo,
+        string[] ImageUrls);
+
     public static void Seed(ApplicationDbContext dbContext)
     {
         try
         {
             SeedAdminUser(dbContext);
-
-            if (!dbContext.Cars.Any())
-            {
-                SeedCarsAndAds(dbContext);
-            }
-
-            BackfillMissingAdImages(dbContext);
-            BackfillSampleAdGalleries(dbContext);
+            SeedCarsAndAds(dbContext);
         }
         catch (Exception ex)
         {
@@ -48,135 +57,168 @@ public static class DbSeeder
 
     private static void SeedCarsAndAds(ApplicationDbContext dbContext)
     {
-        var car1 = new Car { RegNumber = "ABC123", Brand = "Toyota", Model = "Corolla", Year = 2019, MileAge = "45000", FuelType = "Petrol", Transmission = "Automatic", Price = 15000, Description = "Well maintained, low mileage." };
-        var car2 = new Car { RegNumber = "DEF456", Brand = "Ford", Model = "Focus", Year = 2021, MileAge = "22000", FuelType = "Petrol", Transmission = "Manual", Price = 18500, Description = "One owner, full service history." };
-        var car3 = new Car { RegNumber = "GHI789", Brand = "Honda", Model = "Civic", Year = 2018, MileAge = "60000", FuelType = "Petrol", Transmission = "Manual", Price = 17000, Description = "Excellent condition, recently serviced." };
-        var car4 = new Car { RegNumber = "JKL012", Brand = "Tesla", Model = "Model 3", Year = 2020, MileAge = "30000", FuelType = "Electric", Transmission = "Automatic", Price = 35000, Description = "Like new, autopilot included." };
+        var sampleRegNumbers = new[] { "SWE101", "SWE102", "SWE103", "SWE104", "SWE105", "SWE106" };
 
-        dbContext.Cars.AddRange(car1, car2, car3, car4);
-        dbContext.SaveChanges();
+        if (dbContext.Cars.Any(c => sampleRegNumbers.Contains(c.RegNumber)))
+            return;
 
-        dbContext.Ads.AddRange(
-            new Ad
-            {
-                Title = "2019 Toyota Corolla",
-                Description = "Well maintained, low mileage.",
-                ImageUrl = string.Join("\n", new[]
+        var sampleAds = new[]
+        {
+            new SeedAdData(
+                RegNumber: "SWE101",
+                Brand: "Toyota",
+                Model: "Corolla Kombi Hybrid",
+                Year: 2020,
+                Mileage: "58 400",
+                FuelType: "Bensin/El",
+                Transmission: "Automat",
+                Price: 219000m,
+                Title: "Toyota Corolla Kombi Hybrid 2020",
+                Description: "Branslesnal familjekombi med full servicehistorik, vinterhjul och adaptiv farthallare.",
+                City: "Stockholm",
+                Region: "Stockholm",
+                CreatedDaysAgo: 1,
+                ImageUrls: new[]
                 {
                     "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
                     "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80",
                     "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80"
                 }),
-                Price = 15000,
-                CreatedAt = DateTime.UtcNow.AddDays(-5),
-                CarId = car1.CarId,
-                Status = AdStatus.PUBLISHED
-            },
-            new Ad
-            {
-                Title = "2021 Ford Focus",
-                Description = "One owner, full service history.",
-                ImageUrl = string.Join("\n", new[]
+            new SeedAdData(
+                RegNumber: "SWE102",
+                Brand: "Volvo",
+                Model: "XC60",
+                Year: 2019,
+                Mileage: "73 200",
+                FuelType: "Diesel",
+                Transmission: "Automat",
+                Price: 309000m,
+                Title: "Volvo XC60 D4 Momentum 2019",
+                Description: "Bekvam SUV med navigation, stolvarme och nyligen besiktad utan anmarkning.",
+                City: "Gothenburg",
+                Region: "Vastra Gotaland",
+                CreatedDaysAgo: 2,
+                ImageUrls: new[]
                 {
                     "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
                     "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
                     "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
                 }),
-                Price = 18500,
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                CarId = car2.CarId,
-                Status = AdStatus.PUBLISHED
-            },
-            new Ad { Title = "2018 Honda Civic", Description = "Excellent condition, recently serviced.", ImageUrl = "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80", Price = 17000, CreatedAt = DateTime.UtcNow.AddDays(-10), CarId = car3.CarId, Status = AdStatus.PUBLISHED },
-            new Ad { Title = "2020 Tesla Model 3", Description = "Like new, autopilot included.", ImageUrl = "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80", Price = 35000, CreatedAt = DateTime.UtcNow.AddDays(-1), CarId = car4.CarId, Status = AdStatus.PUBLISHED }
-        );
-
-        dbContext.SaveChanges();
-    }
-
-    private static void BackfillMissingAdImages(ApplicationDbContext dbContext)
-    {
-        var sampleImageUrls = new[]
-        {
-            "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80"
-        };
-
-        var adsWithoutImages = dbContext.Ads
-            .Where(a => string.IsNullOrWhiteSpace(a.ImageUrl))
-            .OrderBy(a => a.Id)
-            .ToList();
-
-        if (!adsWithoutImages.Any())
-            return;
-
-        for (var i = 0; i < adsWithoutImages.Count; i++)
-        {
-            adsWithoutImages[i].ImageUrl = sampleImageUrls[i % sampleImageUrls.Length];
-        }
-
-        dbContext.SaveChanges();
-    }
-
-    private static void BackfillSampleAdGalleries(ApplicationDbContext dbContext)
-    {
-        var sampleGalleries = new Dictionary<string, string[]>
-        {
-            ["2019 Toyota Corolla"] = new[]
-            {
-                "https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80"
-            },
-            ["2021 Ford Focus"] = new[]
-            {
-                "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
-            }
-        };
-
-        var adsToUpdate = dbContext.Ads
-            .Where(a => sampleGalleries.Keys.Contains(a.Title))
-            .ToList();
-
-        if (!adsToUpdate.Any())
-            return;
-
-        var changed = false;
-
-        foreach (var ad in adsToUpdate)
-        {
-            var existingUrls = (ad.ImageUrl ?? string.Empty)
-                .Split(new[] { '\r', '\n', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
-
-            foreach (var url in sampleGalleries[ad.Title])
-            {
-                if (!existingUrls.Contains(url, StringComparer.OrdinalIgnoreCase))
+            new SeedAdData(
+                RegNumber: "SWE103",
+                Brand: "Volkswagen",
+                Model: "Golf",
+                Year: 2018,
+                Mileage: "89 500",
+                FuelType: "Bensin",
+                Transmission: "Manuell",
+                Price: 164000m,
+                Title: "Volkswagen Golf TSI Comfortline 2018",
+                Description: "Palitlig halvkombi med lag forbrukning, Apple CarPlay och komplett servicebok.",
+                City: "Malmo",
+                Region: "Skane",
+                CreatedDaysAgo: 3,
+                ImageUrls: new[]
                 {
-                    existingUrls.Add(url);
-                }
-            }
+                    "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=1200&q=80"
+                }),
+            new SeedAdData(
+                RegNumber: "SWE104",
+                Brand: "Tesla",
+                Model: "Model 3 Long Range",
+                Year: 2021,
+                Mileage: "41 300",
+                FuelType: "El",
+                Transmission: "Automat",
+                Price: 419000m,
+                Title: "Tesla Model 3 Long Range AWD 2021",
+                Description: "Lang rackvidd, premiuminterior och aktiv garanti. Hemmaladdare medfoljer.",
+                City: "Uppsala",
+                Region: "Uppsala",
+                CreatedDaysAgo: 4,
+                ImageUrls: new[]
+                {
+                    "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1593941707882-a5bac6861d75?auto=format&fit=crop&w=1200&q=80"
+                }),
+            new SeedAdData(
+                RegNumber: "SWE105",
+                Brand: "BMW",
+                Model: "320d Touring",
+                Year: 2017,
+                Mileage: "112 700",
+                FuelType: "Diesel",
+                Transmission: "Automat",
+                Price: 189000m,
+                Title: "BMW 320d Touring M Sport 2017",
+                Description: "Sportig kombi med M-paket, panoramatak och nyligen bytta bromsbelagg.",
+                City: "Linkoping",
+                Region: "Ostergotland",
+                CreatedDaysAgo: 5,
+                ImageUrls: new[]
+                {
+                    "https://images.unsplash.com/photo-1523983388277-336a66bf9bcd?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1556800572-1b8aeef2c54f?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&q=80"
+                }),
+            new SeedAdData(
+                RegNumber: "SWE106",
+                Brand: "Kia",
+                Model: "Ceed SW",
+                Year: 2022,
+                Mileage: "24 900",
+                FuelType: "Bensin",
+                Transmission: "Automat",
+                Price: 244000m,
+                Title: "Kia Ceed SW Advance 2022",
+                Description: "Modern kombi med filhallningsassistans, kvarvarande nybilsgaranti och mycket lag miltal.",
+                City: "Orebro",
+                Region: "Orebro",
+                CreatedDaysAgo: 6,
+                ImageUrls: new[]
+                {
+                    "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80"
+                })
+        };
 
-            var normalized = existingUrls
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(10)
-                .ToList();
+        var createdAtBase = DateTime.UtcNow;
 
-            var merged = string.Join("\n", normalized);
-            if (!string.Equals(ad.ImageUrl, merged, StringComparison.Ordinal))
+        foreach (var sample in sampleAds)
+        {
+            var car = new Car
             {
-                ad.ImageUrl = merged;
-                changed = true;
-            }
+                RegNumber = sample.RegNumber,
+                Brand = sample.Brand,
+                Model = sample.Model,
+                Year = sample.Year,
+                MileAge = sample.Mileage,
+                FuelType = sample.FuelType,
+                Transmission = sample.Transmission,
+                Price = sample.Price,
+                Description = sample.Description
+            };
+
+            dbContext.Cars.Add(car);
+
+            dbContext.Ads.Add(new Ad
+            {
+                Title = sample.Title,
+                Description = sample.Description,
+                ImageUrl = string.Join("\n", sample.ImageUrls),
+                Price = sample.Price,
+                CreatedAt = createdAtBase.AddDays(-sample.CreatedDaysAgo),
+                Status = AdStatus.PUBLISHED,
+                City = sample.City,
+                Region = sample.Region,
+                Car = car
+            });
         }
 
-        if (changed)
-            dbContext.SaveChanges();
+        dbContext.SaveChanges();
     }
 }
