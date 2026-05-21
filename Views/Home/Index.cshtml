@@ -1,9 +1,70 @@
-﻿@{
+﻿@model IReadOnlyList<Carsure.Models.Ad>
+
+@{
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-4 fw-bold">Welcome to CarSure</h1>
-    <p class="lead mt-3">Find your next car or post your own ad.</p>
-    <a asp-controller="Ad" asp-action="Index" class="btn btn-primary btn-lg mt-3">Browse Ads</a>
-</div>
+<section class="home-landing">
+    <section class="home-hero">
+        <div class="home-hero__content">
+            <h1 class="home-hero__title">Välkommen till CarSure</h1>
+            <p class="home-hero__subtitle">En trygg plats för att hitta din nästa bil eller publicera din egen annons.</p>
+            <div class="home-hero__actions">
+                <a asp-controller="User" asp-action="Login" class="home-cta home-cta--primary">Logga in</a>
+                <a asp-controller="User" asp-action="Register" class="home-cta">Skapa konto</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-latest">
+        <div class="home-latest__header">
+            <div>
+                <p class="home-latest__label">Senaste publicerade annonser</p>
+                <h2 class="home-latest__title">Färska bilar på marknaden</h2>
+            </div>
+            <a asp-controller="Ad" asp-action="Index" class="home-view-all">Visa alla annonser</a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="home-empty">
+                <h3>Inga publicerade annonser än</h3>
+                <p>Bli den första att skapa en annons och starta marknaden.</p>
+                <a asp-controller="Ad" asp-action="Create" class="home-cta home-cta--primary">Skapa din första annons</a>
+            </div>
+        }
+        else
+        {
+            <div class="home-latest__row">
+                @foreach (var ad in Model)
+                {
+                    var primaryImage = ad.GetImageUrls().FirstOrDefault();
+
+                    <article class="home-ad-card">
+                        @if (!string.IsNullOrWhiteSpace(primaryImage))
+                        {
+                            <a asp-controller="Ad" asp-action="Details" asp-route-id="@ad.Id" class="home-ad-card__image-link">
+                                <img class="home-ad-card__image" src="@primaryImage" alt="@ad.Title" loading="lazy" />
+                            </a>
+                        }
+
+                        <div class="home-ad-card__content">
+                            <p class="home-ad-card__meta">
+                                @ad.CreatedAt.ToString("dd MMM yyyy")
+                                @if (!string.IsNullOrWhiteSpace(ad.City))
+                                {
+                                    <span>• @ad.City</span>
+                                }
+                            </p>
+                            <h3 class="home-ad-card__title">@ad.Title</h3>
+                            <p class="home-ad-card__price">@ad.Price.ToString("C")</p>
+                            <a asp-controller="Ad" asp-action="Details" asp-route-id="@ad.Id" class="home-ad-card__link">Se
+                                detaljer</a>
+                            </div>
+                        </article>
+                    }
+                </div>
+
+            }
+        </section>
+    </section>
